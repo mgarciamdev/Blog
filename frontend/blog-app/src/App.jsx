@@ -39,9 +39,20 @@ const App = () => {
 
           </Route>
 
+          {/* Rutas para inicio de Sesión o Creación de Cuenta */}
           <Route path="/admin-login" element={<AdminLogin />} />
         </Routes>
       </Router>
+
+      <Toaster
+        toastOptions={{
+          position: "top-right",
+          className: "",
+          style: {
+            fontSize: "13px",
+          },
+        }}
+      />
     </div>
   )
 }
