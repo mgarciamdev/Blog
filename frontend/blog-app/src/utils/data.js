@@ -168,7 +168,7 @@ export const BLOG_NAVBAR_DATA = [
         id: "03",
         label: "Next Js",
         icon: LuTag,
-        path: "/"
+        path: "/tag/Next"
     },
     {
         id: "04",
