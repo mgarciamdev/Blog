@@ -7,6 +7,7 @@ import { BLOG_NAVBAR_DATA } from '../../../utils/data';
 
 import Logo from '../../../assets/react.svg'
 import { FaCircleChevronDown, FaCircleChevronUp } from 'react-icons/fa6';
+import SideMenu from '../SideMenu';
 
 const BlogNavbar = ({ activeMenu }) => {
     const [openSideMenu, setOpenSideMenu] = useState(false);
@@ -32,7 +33,7 @@ const BlogNavbar = ({ activeMenu }) => {
                         </button>
 
                         <Link>
-                            <img src={Logo} alt="logo" className="h-[24px] md:h-[26px]" />
+                            <img src={Logo} alt="logo" className="h-6 md:h-[26px]" />
                         </Link>
 
                     </div>
@@ -103,7 +104,11 @@ const BlogNavbar = ({ activeMenu }) => {
 
                     {openSideMenu && (
                         <div className="fixed top-[61px] -ml-4 bg-white">
-
+                            <SideMenu
+                                activeMenu={activeMenu}
+                                isBlogMenu
+                                /*setOpenSideMenu={setOpenSideMenu}*/
+                            />
                         </div>
                     )}
                 </div>
