@@ -9,10 +9,11 @@ import { LuLogOut } from 'react-icons/lu';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
 import { useMemo } from 'react';
+import CharAvatar from '../Cards/CharAvatar';
 
 const SideMenu = ({ activeMenu, isBlogMenu }) => {
     const location = useLocation();
-    const user = null;
+    const user = null
     const [openMenu, setOpenMenu] = useState(() => []);
     const navigate = useNavigate();
 
@@ -83,7 +84,12 @@ const SideMenu = ({ activeMenu, isBlogMenu }) => {
                             className="w-20 h-20 bg-slate-400 rounded-full"
                         />
                     ) : (
-                        <></>
+                        <CharAvatar 
+                            fullName={user?.name || ""}
+                            width="w-20"
+                            height="h-20"
+                            style="text-xl"
+                        />
                     )}
                     <div>
                         <h5 className="text-gray-950 font-semibold text-center leading-6 mt-1">
