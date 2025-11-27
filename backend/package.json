@@ -1,0 +1,18 @@
+{
+  "name": "blog_backend",
+  "version": "1.0.0",
+  "description": "Backend de la aplicacion blog tecnico informatico",
+  "keywords": [
+    "Node",
+    "js",
+    "Javascript",
+    "Mongo"
+  ],
+  "license": "ISC",
+  "author": "Mario G.",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
