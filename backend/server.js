@@ -35,16 +35,16 @@ app.use(express.json());
 
 // Rutas
 app.use("/api/auth", authRoutes);
-app.use("/api/posts", blogPostRoutes);
-app.use("/api/comments", commentRoutes);
-app.use("/api/dashboard", dashboardRoutes);
-app.use("/api/ai", aiRoutes);
+// app.use("/api/posts", blogPostRoutes);
+// app.use("/api/comments", commentRoutes);
+// app.use("/api/dashboard", dashboardRoutes);
+// app.use("/api/ai", aiRoutes);
 
-app.use("/api/users", userRoutes);
-app.use("/api/m_dashboard", mdashboard);
-app.use("/api/feedback", feedbackRoutes);
-app.use("/api/saved", savedDataRoutes);
-app.use("/api/reactions", likesDislikesRoutes);
+// app.use("/api/users", userRoutes);
+// app.use("/api/m_dashboard", mdashboard);
+// app.use("/api/feedback", feedbackRoutes);
+// app.use("/api/saved", savedDataRoutes);
+// app.use("/api/reactions", likesDislikesRoutes);
 
 // Server uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads"), {}));

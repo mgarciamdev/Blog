@@ -9,7 +9,17 @@ const UserSchema = new mongoose.Schema(
         profileImageUrl: { type: String, default: null },
         bio: { type: String, default: "" },
         role: { type: String, enum: ["superadmin", "admin", "member"], default: "member" },
-        lastUsernameChange: {type: Date, default: null},
+        lastUsernameChange: { type: Date, default: null },
+
+        // Validación por Email
+        isVerified: { type: Boolean, default: false },
+        verificationToken: { type: String, default: null },
+        vfTokenExpires: { type: Date, default: null },
+
+        //Recuperación de Contraseña
+        resetPasswordToken: { type: String, default: null },
+        rsPassTokenExpires: { type: String, default: null },
+        lastPasswordChange: { type: Date, default: Date.now },
     },
     { timestamps: true }
 );
