@@ -8,27 +8,50 @@ const sendEmail = require("../../utils/sendEmail");
 // @access  Publico
 const registerUser = async (req, res) => {
     try {
-        const { username, name, email, password, profileImageUrl, bio, adminAccessToken } = req.body;
+        const { username, name, email, password, profileImageUrl, bio, adminAccessToken, superAdminSecret } = req.body;
 
-        const userExists = await User.findOne({ email });
-        if (userExists) {
-            return res.status(400).json({ message: "El usuario ya existe" });
+        // Normalización
+        const normalizedUsername = username?.trim().toLowerCase();
+        const normalizedEmail = email?.trim().toLowerCase();
+
+        if (!normalizedUsername) {
+            return res.status(400).json({ message: "El nombre de usuario es obligatorio" });
         }
 
-        const existingUsername = await User.findOne({ username: req.body.username });
+        if (!normalizedEmail) {
+            return res.status(400).json({ message: "El email es obligatorio" });
+        }
+
+        if (!password) {
+            return res.status(400).json({ message: "La contraseña es obligatoria" });
+        }
+
+        // Verificamos si el email ya existe
+        const userExists = await User.findOne({ email: normalizedEmail });
+        if (userExists) {
+            return res.status(400).json({ message: "El email ya está registrado" });
+        }
+
+        //Verificamos si el username ya existe
+        const existingUsername = await User.findOne({ username: normalizedUsername });
         if (existingUsername) {
             return res.status(400).json({ message: "El nombre de usuario ya está en uso" });
         }
 
-        const normalizedUsername = username.trim().toLowerCase();
-
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Determinamos el rol del usuario: Admin si es correcto el token enviado, de otra manera member / cambiar debido a que ahora existiran superadmins
+        // Determinamos el rol del usuario: SuperAdmin o admin si es correcto el token enviado, de otra manera member / cambiar debido a que ahora existiran superadmins
         let role = "member";
+
+        // Creacion de ADMIN
         if (adminAccessToken && adminAccessToken == process.env.ADMIN_ACCESS_TOKEN) {
             role = "admin";
+        }
+
+        // Creacion de SuperAdmin
+        if (superAdminSecret && superAdminSecret == process.env.SUPER_ADMIN_ACCESS_TOKEN) {
+            role = "superadmin";
         }
 
         // Generamos el Token de verificación
@@ -38,10 +61,11 @@ const registerUser = async (req, res) => {
         const user = await User.create({
             username: normalizedUsername,
             name,
-            email,
+            email: normalizedEmail,
             password: hashedPassword,
-            profileImageUrl,
-            bio,
+            profileImageUrl: profileImageUrl || null,
+            bio: bio || "",
+            role,
             isVerified: false,
             verificationToken,
             vfTokenExpires
@@ -50,11 +74,11 @@ const registerUser = async (req, res) => {
         const verifyLink = `${process.env.BACKEND_URL}/api/auth/verify/${verificationToken}`;
 
         await sendEmail(
-            email,
+            normalizedEmail,
             "Verifica tu cuenta",
             `
                 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
-                    <h2 style="color: #333; text-align: center">Hola ${name}</h2>
+                    <h2 style="color: #333; text-align: center">Hola ${name || normalizedUsername}</h2>
                     <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
                     <p style="color: #555; font-size: 16px; line-height: 1.5;">
                         Gracias por registrarte en <strong>Tecno Blog</strong>.
@@ -83,7 +107,7 @@ const registerUser = async (req, res) => {
         );
 
         res.status(201).json({
-            message: "Usuario registrado exitosamente. Revisa tu email para continuar con la verificación de la cuenta"
+            message: "Usuario registrado exitosamente. Revisa tu correo para verificar tu cuenta."
         });
 
     } catch (error) {
@@ -98,3 +122,5 @@ const registerUser = async (req, res) => {
         res.status(500).json({ message: "Error del servidor", error: error.message });
     }
 };
+
+module.exports = { registerUser };

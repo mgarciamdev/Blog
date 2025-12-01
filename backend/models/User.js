@@ -11,9 +11,9 @@ const UserSchema = new mongoose.Schema(
         role: { type: String, enum: ["superadmin", "admin", "member"], default: "member" },
         lastUsernameChange: { type: Date, default: null },
 
-        // Validación por Email
+        // Validación de Email
         isVerified: { type: Boolean, default: false },
-        verificationToken: { type: String, default: null },
+        verificationToken: { type: Date, default: null },
         vfTokenExpires: { type: Date, default: null },
 
         //Recuperación de Contraseña
