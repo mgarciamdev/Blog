@@ -1,4 +1,4 @@
-const User = require("../../models/User"); //mover a superadmin.controller.js
+const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 
 const createAdmin = async (req, res) => {

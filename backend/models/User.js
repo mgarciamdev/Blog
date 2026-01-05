@@ -20,6 +20,9 @@ const UserSchema = new mongoose.Schema(
         resetPasswordToken: { type: String, default: null },
         rsPassTokenExpires: { type: String, default: null },
         lastPasswordChange: { type: Date, default: Date.now },
+
+        //Refresh Token
+        refreshToken: { type: String, default: null }
     },
     { timestamps: true }
 );

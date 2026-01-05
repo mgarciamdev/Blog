@@ -60,7 +60,7 @@ const unbanUser = async (req, res) => {
         res.json({ message: "Usuario desbaneado exitosamente" });
 
     } catch (error) {
-        res.status(500).json({ message: "Errorr al desbanear usuario" });
+        res.status(500).json({ message: "Error al desbanear usuario" });
     }
 };
 
