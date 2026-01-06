@@ -1,19 +1,14 @@
-const Ban = require("../models/Ban");
+const isUserBanned = require("../utils/isUserBanned");
 
 const checkBan = async (req, res, next) => {
-    const ban = await Ban.findOne({
-        user: req.user._id,
-        isActive: true,
-        $or: [
-            { expiresAt: null },
-            { expiresAt: { $gt: new Date() } }
-        ]
-    });
+    const ban = await isUserBanned(req.user._id);
 
     if (ban) {
         return res.status(403).json({
             message: "Tu cuenta esta baneada",
-            reason: ban.reason
+            reason: ban.reason,
+            type: ban.type,
+            expiresAt: ban.expiresAt
         });
     }
 
