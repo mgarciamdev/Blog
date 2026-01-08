@@ -4,7 +4,7 @@ const crypto = require("crypto");
 const sendEmail = require("../../utils/sendEmail");
 
 // @desc    Cambiamos y guardamos la nueva contraseña (antes resetpassword)
-// @route   POST /api/auth/changePass
+// @route   POST /api/auth/changePass/:token
 // @access  Public
 const changePassword = async (req, res) => {
     const { token } = req.params;
@@ -125,7 +125,7 @@ const recoverPassword = async (req, res) => {
 }
 
 // @desc    Validamos el link enviado desde el backend y redireccionamos al frontend
-// @route   GET /api/auth/verifyPass/:token
+// @route   GET /api/auth/recover/:token
 // @access  Public
 const verifyChangeToken = async (req, res) => {
     const { token } = req.params;
