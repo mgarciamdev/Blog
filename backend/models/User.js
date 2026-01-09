@@ -22,7 +22,10 @@ const UserSchema = new mongoose.Schema(
         lastPasswordChange: { type: Date, default: Date.now },
 
         //Refresh Token
-        refreshToken: { type: String, default: null }
+        refreshToken: { type: String, default: null },
+
+        //Estados rapidos
+        isBanned: { type: Boolean, default: false },
     },
     { timestamps: true }
 );

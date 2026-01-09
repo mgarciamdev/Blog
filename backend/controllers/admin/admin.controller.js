@@ -1,12 +1,19 @@
 const User = require("../../models/User");
 const Ban = require("../../models/Ban");
 
+const ROLE_HIERARCHY = {
+    member: 1,
+    admin: 2,
+    superadmin: 3,
+};
+
 // @desc    Baneo de Usuarios
 // @route   POST /api/admin/ban/:userId
-// @access  Private
+// @access  Private (admin | superadmin)
 const banUser = async (req, res) => {
     try {
-        const { userId, reason, durationInDays } = req.body;
+        const { userId } = req.params;
+        const { reason, durationInDays } = req.body;
 
         const userToBan = await User.findById(userId);
 
@@ -14,23 +21,40 @@ const banUser = async (req, res) => {
             return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
-        if (userToBan.role !== "member") {
-            return res.status(403).json({
-                message: "Solo puedes banear a usuarios member"
-            });
+        // Control jerárquico
+        if (
+            ROLE_HIERARCHY[req.user.role] <=
+            ROLE_HIERARCHY[userToBan.role]
+        ) {
+            return res.status(403).json({ message: "No tienes permisos para banear este usuario" });
+        }
+
+        // Ya esta baneado ?
+        const existingBan = await Ban.findOne({
+            user: userToBan._id,
+            isActive: true,
+        });
+
+        if (existingBan) {
+            return res.status(400).json({ message: "El usuario ya se encuentra baneado" });
         }
 
         const expiresAt = durationInDays
             ? new Date(Date.now() + durationInDays * 24 * 60 * 60 * 1000)
             : null;
 
-        const ban = await Ban.create({
+        await Ban.create({
             user: userToBan._id,
             bannedBy: req.user._id,
             reason,
             expiresAt,
             type: expiresAt ? "temporal" : "permanente",
+            isActive: true,
         });
+
+        // Estado rápido en User
+        userToBan.isBanned = true;
+        await userToBan.save();
 
         res.status(201).json({ message: "Usuario baneado correctamente" });
     } catch (error) {
@@ -56,6 +80,11 @@ const unbanUser = async (req, res) => {
 
         ban.isActive = false;
         await ban.save();
+
+        // Actualizamos al usuario
+        await User.findByIdAndUpdate(userId, {
+            isBanned: false,
+        });
 
         res.json({ message: "Usuario desbaneado exitosamente" });
 

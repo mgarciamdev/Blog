@@ -47,7 +47,7 @@ app.use("/api/auth", authRoutes);
 // app.use("/api/reactions", likesDislikesRoutes);
 
 // Server uploads folder
-app.use("/uploads", express.static(path.join(__dirname, "uploads"), {}));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Inicializamos el Servidor
 const PORT = process.env.PORT || 5000;

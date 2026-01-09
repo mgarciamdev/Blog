@@ -21,13 +21,13 @@ const createUpload = ({ folder, allowedTypes, maxSize }) => {
             cb(new Error("Tipo de archivo no permitido"), false);
         }
     };
-}
 
+    return multer({
+        storage,
+        fileFilter,
+        limits: { fileSize: maxSize },
+    });
 
-return multer({
-    storage,
-    fileFilter,
-    limits: { fileSize: maxSize },
-});
+};
 
 module.exports = createUpload;
