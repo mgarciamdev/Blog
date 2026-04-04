@@ -1,0 +1,6 @@
+/**
+ * addStrike
+ * removeStrike
+ * getUserStrike
+ * getModerationHistory
+ */

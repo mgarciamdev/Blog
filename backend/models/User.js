@@ -13,12 +13,12 @@ const UserSchema = new mongoose.Schema(
 
         // Validación de Email
         isVerified: { type: Boolean, default: false },
-        verificationToken: { type: Date, default: null },
+        verificationToken: { type: String, default: null },
         vfTokenExpires: { type: Date, default: null },
 
         //Recuperación de Contraseña
         resetPasswordToken: { type: String, default: null },
-        resetPasswordExpires: { type: String, default: null },
+        resetPasswordExpires: { type: Date, default: null },
         lastPasswordChange: { type: Date, default: Date.now },
 
         //Refresh Token
@@ -26,6 +26,7 @@ const UserSchema = new mongoose.Schema(
 
         //Estados rapidos
         isBanned: { type: Boolean, default: false },
+        strikesCount: { type: Number, default: 0, min: 0 },
     },
     { timestamps: true }
 );
