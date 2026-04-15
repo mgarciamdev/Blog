@@ -15,9 +15,9 @@ router.get("/verify/:token", verifyEmail);
 router.post("/retry-verify", retryVerify);
 
 // Recuperar contraseña
-router.post("/recover", recoverPassword);
-router.get("/recover/:token", verifyChangeToken);
-router.post("/changePass/:token", changePassword);
+router.post("/password/recover", recoverPassword);
+router.get("/password/recover/:token", verifyChangeToken);
+router.post("/password/changePass/:token", changePassword);
 
 // Refresh token
 router.post("/refresh", refreshToken);

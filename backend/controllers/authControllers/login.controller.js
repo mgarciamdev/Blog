@@ -8,7 +8,13 @@ const { generateAccessToken, generateRefreshToken } = require("../../utils/gener
 // @access  Public 
 const loginUser = async (req, res) => {
     try {
-        const { email, password } = req.body;
+        const { email, password, loginType } = req.body;
+
+        if (loginType === "admin" && user.role === "member") {
+            return res.status(403).json({
+                message: "No tienes acceso como admin"
+            });
+        }
 
         const normalizedEmail = email?.trim().toLowerCase();
 
@@ -24,11 +30,6 @@ const loginUser = async (req, res) => {
 
         if (!user.isVerified) {
             return res.status(401).json({ message: "Debes verificar tu email antes de iniciar la sesión" });
-        }
-
-        // Solo members pueden usar este login
-        if (["admin", "superadmin"].includes(user.role)) {
-            return res.status(403).json({ message: "Admins y SuperAdmins tienen su propio Login" });
         }
 
         // Comparamos la contraseña
