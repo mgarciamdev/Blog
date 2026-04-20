@@ -6,6 +6,7 @@ const connectDB = require("./config/db.config");
 
 const authRoutes = require("./routes/auth.routes");
 const moderationRoutes = require("./routes/moderation.routes");
+const superAdminRoutes = require("./routes/superadmin.routes");
 const blogPostRoutes = require("./routes/blogPost.routes");
 const commentRoutes = require("./routes/comment.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
@@ -36,6 +37,7 @@ app.use(express.json());
 
 // Rutas
 app.use("/api/auth", authRoutes);
+app.use("/api/superadmin", superAdminRoutes);
 app.use("/api/moderation", moderationRoutes);
 // app.use("/api/posts", blogPostRoutes);
 // app.use("/api/comments", commentRoutes);

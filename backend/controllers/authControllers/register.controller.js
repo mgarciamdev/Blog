@@ -41,9 +41,6 @@ const registerUser = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Determinamos el rol del usuario por default el role lo dejaremos como member, asi solo los superadmin pueden crear a los admin y asegurarnos de que no se creen mediante el registro publico
-        let role = "member";
-
         // Generamos el Token de verificación
         const verificationToken = crypto.randomBytes(32).toString("hex");
         const vfTokenExpires = Date.now() + 5 * 60 * 1000; // 5 minutos
@@ -55,7 +52,7 @@ const registerUser = async (req, res) => {
             password: hashedPassword,
             profileImageUrl: profileImageUrl || null,
             bio: bio || "",
-            role,
+            role: "member",
             isVerified: false,
             verificationToken,
             vfTokenExpires

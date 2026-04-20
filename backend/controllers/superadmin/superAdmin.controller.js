@@ -1,20 +1,31 @@
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 
+// @desc    Create a new admin
+// @route   Post /api/superadmin/admin
+// @access  Private (Superadmin Only)
 const createAdmin = async (req, res) => {
     try {
         const { username, name, email, password, bio, profileImageUrl } = req.body;
 
         if (!username || !email || !password) {
-            return res.status(400).json({ message: "Datos incompletos" });
+            return res.status(400).json({
+                message: "Datos incompletos"
+            });
         }
 
-        const exists = await User.findOne({ email });
+        const exists = await User.findOne({
+            $or: [
+                { email: email.toLowerCase() },
+                { username: username.toLowerCase() }
+            ]
+        });
+
         if (exists) {
-            return res.status(400).json({ message: "Email ya registrado" });
+            return res.status(400).json({ 
+                message: "Email ya registrado" 
+            });
         }
-
-        let role = "admin";
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -26,7 +37,7 @@ const createAdmin = async (req, res) => {
             password: hashedPassword,
             profileImageUrl: profileImageUrl || null,
             bio: bio || "",
-            role,
+            role: "admin",
             isVerified: true,
         });
 
@@ -38,9 +49,10 @@ const createAdmin = async (req, res) => {
                 role: admin.role
             }
         });
+
     } catch (error) {
         res.status(500).json({
-            message: "Error del servidor", error
+            message: "Error del servidor"
         });
     }
 };
