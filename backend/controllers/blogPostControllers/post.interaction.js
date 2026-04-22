@@ -78,4 +78,8 @@ const incrementView = async (req, res) => {
     }
 };
 
-module.exports = { likePost, dislikePost, incrementView };
+module.exports = { 
+    likePost, 
+    dislikePost, 
+    incrementView 
+};

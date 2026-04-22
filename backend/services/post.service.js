@@ -61,4 +61,30 @@ const incrementPostView = async (postId) => {
     return post;
 };
 
-module.exports = { handleReaction, incrementPostView };
+const slugify = (text) =>
+    text
+        .toLowerCase()
+        .trim()
+        .replace(/ /g, "-")
+        .replace(/[^\w-]+/g, "");
+
+const generateUniqueSlug = async (title) => {
+    let slug = slugify(title);
+    let exists = await BlogPost.findOne({ slug });
+
+    let counter = 1;
+
+    while (exists) {
+        slug = `${slugify(title)}-${counter}`;
+        exists = await BlogPost.findOne({slug});
+        counter++;
+    }
+
+    return slug;
+};
+
+module.exports = { 
+    handleReaction, 
+    incrementPostView, 
+    generateUniqueSlug 
+};
