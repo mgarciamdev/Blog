@@ -94,6 +94,14 @@ const updatePost = async (req, res) => {
         // Sanitizar title
         if (updateData.title) {
             updateData.title = updateData.title.trim();
+
+            // Generamos el slug nuevo unicamente si el titulo cambia
+            if (updateData.title !== post.title) {
+                updateData.slug = await generateUniqueSlug(
+                    updateData.title,
+                    req.params.id
+                );
+            }
         }
 
         // Validar tags
@@ -252,9 +260,9 @@ const getAllPosts = async (req, res) => {
                 draft: draftCount,
             },
             filters: {
-                status,
-                search,
-                tag,
+                status: status || null,
+                search: search || null,
+                tags: tag || null,
             }
         });
 
@@ -296,9 +304,9 @@ const getPostBySlug = async (req, res) => {
             );
 
             // verifica si el post esta en savedPost
-            const saved = await SavedPost.findOne({ 
-                user: userId, 
-                post: post._id 
+            const saved = await SavedPost.findOne({
+                user: userId,
+                post: post._id
             });
 
             savedByUser = !!saved;

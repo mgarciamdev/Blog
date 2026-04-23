@@ -5,14 +5,14 @@ const BlogPost = require("../../models/BlogPost");
 // @access  Public
 const getPostByTag = async (req, res) => {
     try {
-        const { page = 1, limit = 10 } = req.body;
+        const { page = 1, limit = 10 } = req.query;
         const tag = req.params.tag;
 
         const pageNumber = Math.max(1, parseInt(page));
-        const limitNumber = Math.min(50, parseInte(limit));
+        const limitNumber = Math.min(50, parseInt(limit));
 
         const filter = {
-            tags: { $in: [tag] },
+            tags: tag,
             isDraft: false,
         };
 
@@ -63,7 +63,7 @@ const searchPosts = async (req, res) => {
         }
 
         const pageNumber = Math.max(1, parseInt(page));
-        const limitNumber = Math.min(50, parseInte(limit));
+        const limitNumber = Math.min(50, parseInt(limit));
 
         const filter = {
             isDraft: false,
@@ -114,12 +114,16 @@ const getTopPosts = async (req, res) => {
     try {
         const { limit = 5 } = req.query;
 
-        const limitNumber = Math.min(20, parseInt(limit));
+        const limitNumber = Math.min(20, parseInt(limit) || 5);
 
-        const posts = await BlogPost.find({ isDraft: false })
+        const posts = await BlogPost.find({
+            isDraft: false,
+            views: { $gt: 0 }
+        })
             .populate("author", "name profileImageUrl")
-            .sort({ likes: -1, views: -1, createdAt: -1 })
-            .limit(limitNumber);
+            .sort({ views: -1, likes: -1, createdAt: -1 })
+            .limit(limitNumber)
+            .lean();
 
         res.json({
             posts: posts.map(p => ({

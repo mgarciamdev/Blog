@@ -39,7 +39,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/superadmin", superAdminRoutes);
 app.use("/api/moderation", moderationRoutes);
-// app.use("/api/posts", blogPostRoutes);
+app.use("/api/posts", blogPostRoutes);
 // app.use("/api/comments", commentRoutes);
 // app.use("/api/dashboard", dashboardRoutes);
 // app.use("/api/ai", aiRoutes);

@@ -68,23 +68,24 @@ const slugify = (text) =>
         .replace(/ /g, "-")
         .replace(/[^\w-]+/g, "");
 
-const generateUniqueSlug = async (title) => {
-    let slug = slugify(title);
-    let exists = await BlogPost.findOne({ slug });
-
+const generateUniqueSlug = async (title, postId = null) => {
+    let baseSlug = slugify(title);
+    let slug = baseSlug;
     let counter = 1;
 
-    while (exists) {
-        slug = `${slugify(title)}-${counter}`;
-        exists = await BlogPost.findOne({slug});
-        counter++;
-    }
+    while (true) {
+        const existing = await BlogPost.findOne({ slug });
 
-    return slug;
+        if (!existing || existing._id.toString() === postId) {
+            return slug;
+        }
+
+        slug = `${baseSlug}-${counter++}`;
+    }
 };
 
-module.exports = { 
-    handleReaction, 
-    incrementPostView, 
-    generateUniqueSlug 
+module.exports = {
+    handleReaction,
+    incrementPostView,
+    generateUniqueSlug
 };

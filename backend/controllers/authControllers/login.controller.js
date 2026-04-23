@@ -10,12 +10,6 @@ const loginUser = async (req, res) => {
     try {
         const { email, password, loginType } = req.body;
 
-        if (loginType === "admin" && user.role === "member") {
-            return res.status(403).json({
-                message: "No tienes acceso como admin"
-            });
-        }
-
         const normalizedEmail = email?.trim().toLowerCase();
 
         if (!normalizedEmail || !password) {
@@ -23,6 +17,12 @@ const loginUser = async (req, res) => {
         }
 
         const user = await User.findOne({ email: normalizedEmail });
+
+        if (loginType === "admin" && user.role === "member") {
+            return res.status(403).json({
+                message: "No tienes acceso como admin"
+            });
+        }
 
         if (!user) {
             return res.status(400).json({ message: "Email o contraseña invalidos" });
