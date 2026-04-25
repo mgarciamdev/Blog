@@ -15,8 +15,6 @@ const aiRoutes = require("./routes/ai.routes");
 const userRoutes = require("./routes/user.routes");
 const mdashboard = require("./routes/m_dashboard.routes");
 const feedbackRoutes = require("./routes/feedback.routes");
-const savedDataRoutes = require("./routes/saveData.routes");
-const likesDislikesRoutes = require("./routes/like-dislike.routes");
 
 const app = express();
 
@@ -40,15 +38,13 @@ app.use("/api/auth", authRoutes);
 app.use("/api/superadmin", superAdminRoutes);
 app.use("/api/moderation", moderationRoutes);
 app.use("/api/posts", blogPostRoutes);
-// app.use("/api/comments", commentRoutes);
+app.use("/api/comments", commentRoutes);
 // app.use("/api/dashboard", dashboardRoutes);
 // app.use("/api/ai", aiRoutes);
 
 // app.use("/api/users", userRoutes);
 // app.use("/api/m_dashboard", mdashboard);
 // app.use("/api/feedback", feedbackRoutes);
-// app.use("/api/saved", savedDataRoutes);
-// app.use("/api/reactions", likesDislikesRoutes);
 
 // Server uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

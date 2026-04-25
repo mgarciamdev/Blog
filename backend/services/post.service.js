@@ -1,4 +1,4 @@
-const BlogPost = require(".././models/BlogPost");
+const BlogPost = require("../models/BlogPost");
 
 /**
  *  Helper seguro para comparar ObjectId
