@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { banUser, unbanUser, getUserBanHistory, getMyBanHistory, createAppeal, getMyAppeals, getAllAppeals, resolveAppeal, addStrike, getUserStrikes, removeStrike, getMyStrikes, getUserModerationTimeline, getModerationStats, getGlobalModerationStats } = require("../controllers/moderationControllers/index");
+const { banUser, unbanUser, getUserBanHistory, getMyBanHistory, createAppeal, getMyAppeals, getAllAppeals, resolveAppeal, addStrike, getUserStrikes, removeStrike, getMyStrikes, getUserModerationTimeline, getModerationStats, getGlobalStats } = require("../controllers/moderationControllers/index");
 const { protect } = require("../middlewares/authMiddleware");
 const { authorize } = require("../middlewares/authorizeMiddleware");
 
@@ -122,7 +122,7 @@ router.get(
     "/stats",
     protect,
     authorize("admin", "superadmin"),
-    getGlobalModerationStats
+    getGlobalStats
 );
 
 module.exports = router;

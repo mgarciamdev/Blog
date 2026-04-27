@@ -13,7 +13,6 @@ const dashboardRoutes = require("./routes/dashboard.routes");
 const aiRoutes = require("./routes/ai.routes");
 
 const userRoutes = require("./routes/user.routes");
-const mdashboard = require("./routes/m_dashboard.routes");
 const feedbackRoutes = require("./routes/feedback.routes");
 
 const app = express();
@@ -22,7 +21,7 @@ const app = express();
 app.use(
     cors({
         origin: "*",
-        methods: ["GET", "POST", "PUT", "DELETE"],
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
     })
 );
@@ -39,7 +38,7 @@ app.use("/api/superadmin", superAdminRoutes);
 app.use("/api/moderation", moderationRoutes);
 app.use("/api/posts", blogPostRoutes);
 app.use("/api/comments", commentRoutes);
-// app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 // app.use("/api/ai", aiRoutes);
 
 // app.use("/api/users", userRoutes);
