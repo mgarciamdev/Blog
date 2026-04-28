@@ -1,5 +1,5 @@
 const express = require("express");
-const { loginUser, refreshToken, logoutUser, registerUser, changePassword, recoverPassword, verifyChangeToken, verifyEmail, retryVerify } = require("../controllers/authControllers/index");
+const { loginUser, refreshToken, logoutUser, registerUser, resetPassword, recoverPassword, verifyChangeToken, verifyEmail, retryVerify } = require("../controllers/authControllers/index");
 const { protect } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
@@ -17,7 +17,7 @@ router.post("/retry-verify", retryVerify);
 // Recuperar contraseña
 router.post("/password/recover", recoverPassword);
 router.get("/password/recover/:token", verifyChangeToken);
-router.post("/password/changePass/:token", changePassword);
+router.post("/password/reset-password/:token", resetPassword);
 
 // Refresh token
 router.post("/refresh", refreshToken);

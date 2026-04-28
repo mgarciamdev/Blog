@@ -29,7 +29,7 @@ const verifyEmail = async (req, res) => {
     }
 };
 
-// @desc    Reenvia el correo con token de verificación cuando este se encuentra expirado o sea invalido (antes resendVerification)
+// @desc    Reenviar email de verificación
 // @route   POST /api/auth/retry-verify
 // @access  Public
 const retryVerify = async (req, res) => {
@@ -37,57 +37,34 @@ const retryVerify = async (req, res) => {
     const normalizedEmail = email?.trim().toLowerCase();
 
     try {
-        const user = await User.findOne({ normalizedEmail });
+        const user = await User.findOne({ email: normalizedEmail });
 
         if (!user) {
-            return res.status(404).json({ message: "Usuario no encontrado" });
+            return res.status(200).json({ 
+                message: "Si el email existe, se enviará un nuevo enlace" 
+            });
         }
 
         if (user.isVerified) {
-            return res.status(400).json({ message: "Usuario ya verificado" });
+            return res.status(400).json({ 
+                message: "Usuario ya verificado" 
+            });
         }
 
-        // Generamos un nuevo token de verificación con un tiempo de vida de 5 min
+        // Generamos un nuevo token de verificación
         const retryToken = crypto.randomBytes(32).toString("hex");
 
         user.verificationToken = retryToken;
-        user.vfTokenExpires = Date.now() + 5 * 60 * 1000; // tiempo de vida de 5 min
+        user.vfTokenExpires = Date.now() + 60 * 60 * 1000; // 1 hora
+
         await user.save();
 
-        const verifyLink = `${process.env.BACKEND_URL}/api/auth/verify/${retryToken}`;
+        await sendVerificationEmail(user, retryToken);
 
-        await sendEmail(
-            email,
-            "Verifica tu cuenta",
-            `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
-                    <h2 style="color: #333; text-align: center;">👋 Hola ${user.name}</h2>
-                    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
-                    <p style="color: #555; font-size: 16px; line-height: 1.5;">
-                    Gracias por registrarte en <strong>MiAplicación</strong>.  
-                    Para completar tu registro, por favor verifica tu cuenta haciendo clic en el botón de abajo:
-                    </p>
-                    <div style="text-align: center; margin: 30px 0;">
-                    <a href="${verifyLink}" 
-                        style="display: inline-block; padding: 12px 24px; background-color: #2563eb; color: #fff; text-decoration: none; border-radius: 6px; font-size: 16px;">
-                        Verificar mi cuenta
-                    </a>
-                    </div>
-                    <p style="color: #777; font-size: 14px;">
-                    Si el botón no funciona, copia y pega este enlace en tu navegador:
-                    </p>
-                    <p style="word-break: break-all; color: #2563eb; font-size: 14px;">
-                    ${verifyLink}
-                    </p>
-                    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
-                    <p style="color: #999; font-size: 12px; text-align: center;">
-                    © ${new Date().getFullYear()} MiAplicación. Todos los derechos reservados.
-                    </p>
-                </div>
-            `
-        );
+        res.json({ 
+            message: "Se envio un nuevo correo de verificación" 
+        });
 
-        res.json({ message: "Se envio un nuevo correo de verificación" });
     } catch (error) {
         res.status(500).json({ message: "Error del Servidor" });
     }

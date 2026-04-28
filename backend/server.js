@@ -7,6 +7,7 @@ const connectDB = require("./config/db.config");
 const authRoutes = require("./routes/auth.routes");
 const moderationRoutes = require("./routes/moderation.routes");
 const superAdminRoutes = require("./routes/superadmin.routes");
+const adminRoutes = require("./routes/admin.routes");
 const blogPostRoutes = require("./routes/blogPost.routes");
 const commentRoutes = require("./routes/comment.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
@@ -41,8 +42,8 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 // app.use("/api/ai", aiRoutes);
 
-// app.use("/api/users", userRoutes);
-// app.use("/api/m_dashboard", mdashboard);
+app.use("/api/users", userRoutes);
+app.use("/api/admin", adminRoutes);
 // app.use("/api/feedback", feedbackRoutes);
 
 // Server uploads folder

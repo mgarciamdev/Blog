@@ -2,11 +2,12 @@ const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const sendEmail = require("../../utils/sendEmail");
+const { sendPasswordChangeEmail, sendRecoverPasswordEmail } = require("../../utils/emailHelper");
 
-// @desc    Cambiamos y guardamos la nueva contraseña (antes resetpassword)
-// @route   POST /api/auth/changePass/:token
+// @desc    Reset de contraseña con token
+// @route   POST /api/auth/reset-password/:token
 // @access  Public
-const changePassword = async (req, res) => {
+const resetPassword = async (req, res) => {
     const { token } = req.params;
     const { password } = req.body;
 
@@ -18,11 +19,13 @@ const changePassword = async (req, res) => {
 
         const user = await User.findOne({
             resetPasswordToken: hashedToken,
-            rsPassTokenExpires: { $gt: Date.now() },
+            resetPasswordExpires: { $gt: Date.now() },
         });
 
         if (!user) {
-            return res.status(400).json({ message: "Token invalido o expirado" });
+            return res.status(400).json({
+                message: "Token invalido o expirado"
+            });
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -36,21 +39,7 @@ const changePassword = async (req, res) => {
 
         await user.save();
 
-        await sendEmail(
-            user.email,
-            "Confirmación de cambio de contraseña",
-            `
-                <div style="font-family: Arial, sans-serif; padding: 20px;>
-                    <h2 style="color: #333;">Hola ${user.username || "Usuario"},</h2>
-                    <p>Tu contraseña en <strong>Mi Aplicación</strong> ha sido cambiada correctamente.</p>
-                    <p>Si no realizaste este cambio, te recomendamos restablecerla inmediatamente o contactar a soporte.</p>
-                    </br>
-                    <p style="color: #777; font-size: 14px;">
-                        © ${new Date().getFullYear()} MiAplicación
-                    </p>
-                </div>
-            `
-        );
+        await sendPasswordChangeEmail(user, req);
 
         res.status(200).json({ message: "Contraseña actualizada con éxito" });
     } catch (error) {
@@ -59,7 +48,7 @@ const changePassword = async (req, res) => {
     }
 }
 
-// @desc    Envia email con un link con un token para recuperar la contraseña (antes forgotpassword)
+// @desc    Envia email con un link para recuperar la contraseña
 // @route   POST /api/auth/recover
 // @access  Public
 const recoverPassword = async (req, res) => {
@@ -72,7 +61,7 @@ const recoverPassword = async (req, res) => {
             return res.status(200).json({ message: "Si el email existe, recibirás instrucciones" });
         }
 
-        // Generamos un Token unico que se envia al usuario que recupera la contraseña
+        // Generamos nuevo Token
         const recoverToken = crypto.randomBytes(32).toString("hex");
 
         const hashedToken = crypto
@@ -85,40 +74,12 @@ const recoverPassword = async (req, res) => {
         user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // Duración de 15 min
         await user.save();
 
-        const recoverLink = `${process.env.BACKEND_URL}/api/auth/recover/${recoverToken}`;
+        await sendRecoverPasswordEmail(user, recoverToken);
 
-        await sendEmail(
-            email,
-            "Recuperación de contraseña",
-            `
-                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background: #f9f9f9; border-radius: 8px; border: 1px solid #ddd;">
-                    <h2 style="color: #333; text-align: center;">${user.name || "Usuario"}</h2>
-                    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
-                    <p style="color: #555; font-size: 16px; line-height: 1.5;">
-                        Has solicitado recuperar tu contraseña en <strong>MiAplicación</strong>.  
-                        Para continuar, haz clic en el botón de abajo:
-                    </p>
-                        <div style="text-align: center; margin: 30px 0;">
-                            <a href="${recoverLink}" style="display: inline-block; padding: 12px 24px;        background-color: #2563eb; color: #fff; text-decoration: none; border-radius: 6px; font-size: 16px;"
-                            >
-                                Recuperación de contraseña
-                            </a>
-                        </div>
-                    <p style="color: #777; font-size: 14px;">
-                        Si el botón no funciona, copia y pega este enlace en tu navegador:
-                    </p>
-                    <p style="word-break: break-all; color: #2563eb; font-size: 14px;">
-                        ${recoverLink}
-                    </p>
-                    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;" />
-                    <p style="color: #999; font-size: 12px; text-align: center;">
-                        © ${new Date().getFullYear()} MiAplicación. Todos los derechos reservados.
-                    </p>
-                </div>
-            `
-        );
+        res.json({
+            message: "Se envio correctamente el correo de recuperación con exito"
+        });
 
-        res.json({ message: "Se envio correctamente el correo de recuperación con exito" });
     } catch (error) {
         res.status(500).json({ message: "Error del Servidor" });
     }
@@ -151,4 +112,4 @@ const verifyChangeToken = async (req, res) => {
     }
 };
 
-module.exports = { changePassword, recoverPassword, verifyChangeToken };
+module.exports = { resetPassword, recoverPassword, verifyChangeToken };
