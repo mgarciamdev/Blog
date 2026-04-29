@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const { sendPasswordChangeEmail } = require("../../utils/emailHelper");
 
 // @desc    Get my profile
-// @route   GET /api/users/me
+// @route   GET /api/users/profile
 // @access  Private
 const getMyProfile = async (req, res) => {
     try {
@@ -31,11 +31,11 @@ const getMyProfile = async (req, res) => {
 };
 
 // @desc    Update my profile
-// @route   PUT /api/users/me
+// @route   PUT /api/users/profile
 // @access  Private
 const updateProfile = async (req, res) => {
     try {
-        const { name, bio, profileImageUrl } = req.body;
+        let { name, bio, profileImageUrl } = req.body;
 
         const user = await User.findById(req.user._id);
 
@@ -48,6 +48,10 @@ const updateProfile = async (req, res) => {
         // limpiamos
         if (name) name = name.trim();
         if (bio) bio = bio.trim();
+
+        // evitamos strings vacios
+        if (name === "") name = undefined;
+        if (bio === "") bio = undefined;
 
         // Validamos
         if (name && name.length > 50) {
@@ -114,12 +118,12 @@ const getUserById = async (req, res) => {
     }
 };
 
-// @desc    Change password
+// @desc    Actualizar contraseña
 // @route   PUT /api/users/change-password
 // @access  Private
 const changePassword = async (req, res) => {
     try {
-        const { userId } = req.user._id;
+        const userId = req.user._id;
         const { currentPassword, newPassword } = req.body;
 
         if (!currentPassword || !newPassword) {
@@ -344,7 +348,7 @@ const checkUsername = async (req, res) => {
         // generamos sugerencias limpias
         const base = normalized.replace(/[^a-z0-9]/gi, "") || "user";
 
-        const random = (min, max) => 
+        const random = (min, max) =>
             Math.floor(Math.random() * (max - min + 1)) + min;
 
         const suggestions = [
@@ -358,7 +362,7 @@ const checkUsername = async (req, res) => {
             message: "El nombre de usuario ya está en uso",
             suggestions
         });
-        
+
     } catch (error) {
         res.status(500).json({
             message: "Erro en el servidor",

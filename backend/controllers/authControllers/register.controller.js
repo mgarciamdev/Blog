@@ -1,8 +1,7 @@
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const sendEmail = require("../../utils/sendEmail");
-const { sendVerificationEmail } = require("../../utils/emailHelpers");
+const { sendVerificationEmail } = require("../../utils/emailHelper");
 
 // @desc    Registro de nuevos usuarios
 // @route   POST /api/auth/register

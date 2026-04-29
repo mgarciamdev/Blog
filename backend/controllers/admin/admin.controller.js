@@ -35,13 +35,13 @@ const getUserByIdAdmin = async (req, res) => {
 };
 
 // @desc    Delete user (Admin)
-// @route   DELETE /api/users/:userId
+// @route   DELETE /api/admin/users/:id
 // @access  Private (admin | superadmin)
 const deleteUser = async (req, res) => {
     try {
-        const { userId } = req.params;
+        const { id } = req.params;
 
-        const userToDelete = await Userser.findById(userId);
+        const userToDelete = await User.findById(id);
 
         if (!userToDelete) {
             return res.status(404).json({

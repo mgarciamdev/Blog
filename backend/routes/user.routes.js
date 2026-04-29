@@ -13,18 +13,13 @@ const {
 
 const { protect } = require("../middlewares/authMiddleware");
 
-// Publicas
-router.get(
-    "/check",
-    checkUsername
-);
-
-router.get(
-    "/:id",
-    getUserById
-);
-
 // Privadas
+router.get(
+    "/profile",
+    protect,
+    getMyProfile
+);
+
 router.put(
     "/profile",
     protect,
@@ -38,7 +33,7 @@ router.put(
 );
 
 router.put(
-    "/password",
+    "/change-password",
     protect,
     changePassword
 );
@@ -47,6 +42,17 @@ router.delete(
     "/me",
     protect,
     deleteMyAccount
+);
+
+// Publicas
+router.get(
+    "/check",
+    checkUsername
+);
+
+router.get(
+    "/:id",
+    getUserById
 );
 
 module.exports = router;

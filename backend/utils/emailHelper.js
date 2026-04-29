@@ -1,4 +1,4 @@
-const sendMail = require("./sendEmail");
+const sendEmail = require("./sendEmail");
 
 // user
 const sendPasswordChangeEmail = async (user, req) => {
