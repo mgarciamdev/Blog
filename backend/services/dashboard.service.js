@@ -2,6 +2,7 @@ const BlogPost = require("../models/BlogPost");
 const Comment = require("../models/Comment");
 const User = require("../models/User");
 const SavedPost = require("../models/SavedPost");
+const Feedback = require("../models/Feedback");
 
 const { getGlobalModerationStats, getUserModerationSummary } = require("../services/moderation.service");
 
@@ -11,13 +12,20 @@ const getAdminDashboard = async () => {
         drafts,
         published,
         totalComments,
-        aiGenerated
+        aiGenerated,
+        unreadFeedbacks,
+        recentFeedbacks
     ] = await Promise.all([
         BlogPost.countDocuments(),
         BlogPost.countDocuments({ isDraft: true }),
         BlogPost.countDocuments({ isDraft: false }),
         Comment.countDocuments(),
-        BlogPost.countDocuments({ generatedByAI: true })
+        BlogPost.countDocuments({ generatedByAI: true }),
+        Feedback.countDocuments({ status: "pending" }),
+        Feedback.find()
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .populate("sender", "username name profileImageUrl")
     ]);
 
     const moderation = await getGlobalModerationStats();
@@ -60,10 +68,12 @@ const getAdminDashboard = async () => {
             totalLikes,
             totalDislikes,
             totalComments,
-            aiGenerated
+            aiGenerated,
+            unreadFeedbacks
         },
         topPosts,
         recentComments,
+        recentFeedbacks,
         tagUsage,
         moderation
     };
@@ -74,12 +84,14 @@ const getSuperAdminDashboard = async () => {
         totalUsers,
         verifiedUsers,
         unVerifiedUsers,
-        admins
+        admins,
+        unreadFeedbacks
     ] = await Promise.all([
         User.countDocuments(),
         User.countDocuments({ isVerified: true }),
         User.countDocuments({ isVerified: false }),
-        User.countDocuments({ role: "admin" })
+        User.countDocuments({ role: "admin" }),
+        Feedback.countDocuments({ status: "pending" })
     ]);
 
     const moderation = await getGlobalModerationStats();
@@ -97,7 +109,8 @@ const getSuperAdminDashboard = async () => {
             totalUsers,
             verifiedUsers,
             unVerifiedUsers,
-            admins
+            admins,
+            unreadFeedbacks
         },
         tagUsage,
         moderation
@@ -108,11 +121,15 @@ const getMemberDashboard = async (userId) => {
     const [
         savedPostCount,
         myComments,
-        moderation
+        moderation,
+        myFeedbacks,
+        myRespondedFeedbacks
     ] = await Promise.all([
         SavedPost.countDocuments({ user: userId }),
         Comment.countDocuments({ author: userId }),
-        getUserModerationSummary(userId)
+        getUserModerationSummary(userId),
+        Feedback.countDocuments({ sender: userId }),
+        Feedback.countDocuments({ sender: userId, status: "responded" })
     ]);
 
     const recentSaved = await SavedPost.find({ user: userId })
@@ -123,14 +140,21 @@ const getMemberDashboard = async (userId) => {
             select: "title slug coverImageUrl"
         });
 
+    const recentFeedbacks = await Feedback.find({ sender: userId })
+        .sort({ createdAt: -1 })
+        .limit(5);
+
     return {
         type: "member",
         stats: {
             savedPostCount,
-            myComments
+            myComments,
+            myFeedbacks,
+            myRespondedFeedbacks
         },
         moderation,
-        recentSaved
+        recentSaved,
+        recentFeedbacks
     };
 };
 
