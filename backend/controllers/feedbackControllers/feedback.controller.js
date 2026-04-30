@@ -1,5 +1,6 @@
 const Feedback = require("../../models/Feedback");
 const User = require("../../models/User");
+const { sendFeedbackResponseEmail } = require("../../utils/emailHelper");
 
 // @desc    Crear un nuevo feedback por parte del usuario
 // @route   POST /api/feedback
@@ -120,7 +121,8 @@ const respondFeedback = async (req, res) => {
             });
         }
 
-        const feedback = await Feedback.findById(req.params.id);
+        const feedback = await Feedback.findById(req.params.id)
+            .populate("sender", "email name username profileImageUrl");
 
         if (!feedback) {
             return res.status(404).json({
@@ -146,6 +148,17 @@ const respondFeedback = async (req, res) => {
         feedback.status = "responded";
 
         await feedback.save();
+
+        // enviar email
+        try {
+            await sendFeedbackResponseEmail(
+                feedback.sender,
+                feedback,
+                content
+            );
+        } catch (emailError) {
+            console.error("Error enviando email:", emailError.message);
+        }
 
         res.json({
             message: "Feedback respondido correctamente",

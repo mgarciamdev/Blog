@@ -32,7 +32,7 @@ const sendPasswordChangeEmail = async (user, req) => {
 };
 
 // recoverPassword email (auth)
-const sendRecoverPasswordEmail =async (user, token) => {
+const sendRecoverPasswordEmail = async (user, token) => {
     const recoverLink = `${process.env.BACKEND_URL}/api/auth/recover/${token}`;
 
     await sendEmail(
@@ -120,10 +120,43 @@ const sendVerificationEmail = async (user, token) => {
     );
 };
 
-// retry verification email (auth)
+// send feedback response (admin)
+const sendFeedbackResponseEmail = async (user, feedback, responseContent) => {
+    const subject = "Respuesta a tu feedback";
+
+    const html = `
+        <div style="font-family: Arial; padding: 20px;">
+            <h2>Hola ${user.name || user.username}</h2>
+            
+            <p>Tu feedback ha sido respondido por nuestro equipo:</p>
+
+            <div style="background:#f4f4f4; padding:15px; border-radius:8px;">
+                <strong>Tu mensaje:</strong>
+                <p>${feedback.message}</p>
+            </div>
+
+            <br/>
+
+            <div style="background:#e6f0ff; padding:15px; border-radius:8px;">
+                <strong>Respuesta:</strong>
+                <p>${responseContent}</p>
+            </div>
+
+            <br/>
+
+            <p>Puedes ingresar a la plataforma para más detalles.</p>
+
+            <hr/>
+            <small>© ${new Date().getFullYear()} Tu App</small>
+        </div>
+    `;
+
+    await sendEmail(user.email, subject, html);
+}
 
 module.exports = {
     sendPasswordChangeEmail,
     sendRecoverPasswordEmail,
-    sendVerificationEmail
+    sendVerificationEmail,
+    sendFeedbackResponseEmail
 };
