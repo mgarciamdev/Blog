@@ -1,6 +1,7 @@
 const Strike = require("../../models/Strike");
 const User = require("../../models/User");
 const Ban = require("../../models/Ban");
+const { calculateActiveStrikePoints } = require("../../services/moderation.service");
 
 const ROLE_HIERARCHY = {
     member: 1,
@@ -45,7 +46,8 @@ const addStrike = async (req, res) => {
             });
         }
 
-        const strikePoints = Math.max(1, parseInt(points) || 1);
+        const paresedPoints = parseInt(points);
+        const strikePoints = Number.isNaN(paresedPoints) ? 1 : Math.max(1, paresedPoints);
 
         const strike = await Strike.create({
             user: userId,
@@ -54,18 +56,7 @@ const addStrike = async (req, res) => {
             points: strikePoints,
         });
 
-        // Contar strikes activos
-        const totalStrikes = await Strike.aggregate([
-            { $match: { user: user._id, status: "activo" } },
-            {
-                $group: {
-                    _id: null,
-                    total: { $sum: "$points" }
-                }
-            }
-        ]);
-
-        const total = totalStrikes[0]?.total || 0;
+        const total = await calculateActiveStrikePoints(user._id);
 
         // Evitar doble ban
         const existingBan = await Ban.findOne({
@@ -139,7 +130,29 @@ const removeStrike = async (req, res) => {
         }
 
         strike.status = "revocado";
+
+        if (strike.status === "revocado") {
+            return res.status(400).json({
+                message: "El strike ya fue revocado"
+            });
+        }
+
         await strike.save();
+
+        // recalculamos
+        const totalPoints = await calculateActiveStrikePoints(strike.user);
+
+        // si baja de 3 -> quitar ban
+        if (totalPoints < 3) {
+            await Ban.updateMany(
+                { user: strike.user, isActive: true },
+                { isActive: false }
+            );
+
+            await User.findByIdAndUpdate(strike.user, {
+                isBanned: false
+            });
+        }
 
         res.json({
             message: "Strike revocado correctamente",

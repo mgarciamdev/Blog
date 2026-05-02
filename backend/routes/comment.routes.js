@@ -12,10 +12,12 @@ const {
 
 const { protect } = require("../middlewares/authMiddleware");
 const { authorize } = require("../middlewares/authorizeMiddleware");
+const { blockIfBanned } = require("../middlewares/blockIfBanned");
+
 /**
  * Crear comentario
  */
-router.post("/:postId", protect, addComment);
+router.post("/:postId", protect, blockIfBanned, addComment);
 
 /**
  * Obtener todos los comentarios (ADMIN)
@@ -30,16 +32,16 @@ router.get("/:postId", getCommentsByPost);
 /**
  * Actualizar comentario
  */
-router.put("/:commentId", protect, updateComment);
+router.put("/:commentId", protect, blockIfBanned, updateComment);
 
 /**
  * Eliminar comentario
  */
-router.delete("/:commentId", protect, deleteComment);
+router.delete("/:commentId", protect, blockIfBanned, deleteComment);
 
 /**
  * Reacciones (Like / Dislike)
  */
-router.post("/:commentId/reaction", protect, reactToComment);
+router.post("/:commentId/reaction", protect, blockIfBanned, reactToComment);
 
 module.exports = router;

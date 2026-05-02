@@ -122,7 +122,7 @@ const getMyAppeals = async (req, res) => {
 
         const total = await Appeal.countDocuments(filter);
 
-        const appeals = await Appeal.find({ filter })
+        const appeals = await Appeal.find(filter)
             .populate("strike", "points status")
             .populate("ban", "type expiresAt isActive")
             .sort({ createdAt: -1 })
@@ -236,6 +236,13 @@ const resolveAppeal = async (req, res) => {
             });
         }
 
+        // evitar auto-resolución (admin no se puede quitar a si mismo un ban o strike tiene que ser otro)
+        if (appeal.user.toString() === req.user._id.toString()) {
+            return res.status(403).json({
+                message: "No puedes resolver tu propia apelación"
+            });
+        }
+
         //____________________//
         //  ACEPTAR APELACIÓN //
         //____________________//
@@ -257,6 +264,10 @@ const resolveAppeal = async (req, res) => {
                 if (ban && ban.isActive) {
                     ban.isActive = false;
                     await ban.save();
+
+                    await User.findByIdAndUpdate(ban.user, {
+                        isBanned: false
+                    });
                 }
             }
 
@@ -280,9 +291,13 @@ const resolveAppeal = async (req, res) => {
             appeal: {
                 id: appeal._id,
                 status: appeal.status,
+                action,
+                type: appeal.strike ? "strike" : "ban",
                 reason: appeal.reasonSnapshot,
                 resolvedAt: appeal.resolvedAt,
             },
+            unbanned: !!appeal.ban,
+            strikeRevoked: !!appeal.strike
         });
 
     } catch (error) {

@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Strike = require("../models/Strike");
 const Ban = require("../models/Ban");
+const mongoose = require("mongoose");
 
 const getModerationStatsByUser = async (userId) => {
     const user = await User.findById(userId)
@@ -10,12 +11,36 @@ const getModerationStatsByUser = async (userId) => {
         throw new Error("Usuario no encontrado");
     }
 
-    const strikes = await Strike.find({ user: userId });
     const bans = await Ban.find({ user: userId });
 
-    const totalStrikes = strikes.length;
-    const activeStrikes = strikes.filter(s => s.status === "activo").length;
-    const totalPoints = strikes.reduce((acc, s) => acc + s.points, 0);
+    const strikesStatsAgg = await Strike.aggregate([
+        { $match: { user: userId } },
+        {
+            $group: {
+                _id: null,
+                totalStrikes: { $sum: 1 },
+                activeStrikes: {
+                    $sum: {
+                        $cond: [
+                            { $eq: ["status", "activo"] },
+                            "$points",
+                            0
+                        ]
+                    }
+                }
+            }
+        }
+    ]);
+
+    const strikeStats = strikesStatsAgg[0] || {
+        totalStrikes: 0,
+        activeStrikes: 0,
+        totalPoints: 0
+    };
+
+    const totalStrikes = strikeStats.totalStrikes;
+    const activeStrikes = strikeStats.activeStrikes;
+    const totalPoints = strikeStats.totalPoints;
 
     const totalBans = bans.length;
     const activeBans = bans.filter(b => b.isActive).length;
@@ -28,7 +53,7 @@ const getModerationStatsByUser = async (userId) => {
 
     const daysActive = Math.max(
         1,
-        (Date.now() - new Date(user.createdAt)) / (1000 * 60 * 60 * 24)
+        Math.floor((Date.now() - new Date(user.createdAt)) / (1000 * 60 * 60 * 24))
     );
 
     const strikeRate = totalStrikes / daysActive;
@@ -52,10 +77,13 @@ const getModerationStatsByUser = async (userId) => {
 
 const getGlobalModerationStats = async () => {
     const totalStrikes = await Strike.countDocuments();
+    const activeStrikes = await Strike.countDocuments({ status: "activo" });
+
     const totalBans = await Ban.countDocuments();
     const activeBans = await Ban.countDocuments({ isActive: true });
 
     const pointsAgg = await Strike.aggregate([
+        { $match: { status: "activo" } },
         {
             $group: {
                 _id: null,
@@ -66,7 +94,8 @@ const getGlobalModerationStats = async () => {
 
     const totalPoints = pointsAgg[0]?.totalPoints || 0;
 
-    const topStrikes = await Strike.aggregate([
+    const topUsersbyStrikes = await Strike.aggregate([
+        { $match: { status: "activo" } },
         {
             $group: {
                 _id: "$user",
@@ -78,7 +107,7 @@ const getGlobalModerationStats = async () => {
         { $limit: 5 },
     ]);
 
-    const populatedTopStrikes = await User.populate(topStrikes, {
+    const populatedTopStrikes = await User.populate(topUsersbyStrikes, {
         path: "_id",
         select: "username email role",
     });
@@ -92,6 +121,7 @@ const getGlobalModerationStats = async () => {
     return {
         stats: {
             totalStrikes,
+            activeStrikes,
             totalBans,
             activeBans,
             totalPoints,
@@ -102,19 +132,25 @@ const getGlobalModerationStats = async () => {
 };
 
 const getUserModerationSummary = async (userId) => {
-    const totalStrikes = await Strike.countDocuments({ user: userId });
-
-    const activeBan = await Ban.findOne({
-        user: userId,
-        isActive: true
-    });
+    const [activeStrikes, activeBan] = await Promise.all([
+        Strike.countDocuments({
+            user: userId,
+            status: "activo"
+        }),
+        Ban.findOne({
+            user: userId,
+            isActive: true
+        })
+    ]);
 
     // Estado del usuario (hay que ajustarlo posteriormente en las reglas)
     let status = "good";
 
+    const STRIKE_WARNING_THRESHOLD = 2;
+
     if (activeBan) {
         status = "banned";
-    } else if (totalStrikes >= 2) {
+    } else if (activeStrikes >= STRIKE_WARNING_THRESHOLD) {
         status = "warning";
     } else {
         status = "good";
@@ -126,16 +162,39 @@ const getUserModerationSummary = async (userId) => {
         banned: "Tu cuenta está suspendida"
     };
 
+    const remainingToWarning = Math.max(
+        0,
+        STRIKE_WARNING_THRESHOLD - activeStrikes
+    )
+
     return {
-        strikes: totalStrikes,
+        strikes: activeStrikes,
         isBanned: !!activeBan,
         status,
-        message: STATUS_MESSAGES[status]
+        message: STATUS_MESSAGES[status],
+        remainingToWarning
     };
+};
+
+const calculateActiveStrikePoints = async (userId) => {
+    const objectUserId = new mongoose.Types.ObjectId(userId);
+
+    const result = await Strike.aggregate([
+        { $match: { user: objectUserId, status: "activo" } },
+        {
+            $group: {
+                _id: null,
+                total: { $sum: "$points" }
+            }
+        }
+    ]);
+
+    return result[0]?.total || 0;
 };
 
 module.exports = {
     getModerationStatsByUser,
     getGlobalModerationStats,
-    getUserModerationSummary
+    getUserModerationSummary,
+    calculateActiveStrikePoints
 };

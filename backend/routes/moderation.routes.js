@@ -2,8 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 const { banUser, unbanUser, getUserBanHistory, getMyBanHistory, createAppeal, getMyAppeals, getAllAppeals, resolveAppeal, addStrike, getUserStrikes, removeStrike, getMyStrikes, getUserModerationTimeline, getModerationStats, getGlobalStats } = require("../controllers/moderationControllers/index");
+
 const { protect } = require("../middlewares/authMiddleware");
 const { authorize } = require("../middlewares/authorizeMiddleware");
+const { checkBan } = require("../middlewares/banMiddleware");
 
 /**
  * BAN ROUTES
@@ -15,7 +17,7 @@ router.post(
     banUser
 );
 
-// Historial propio (usuario)
+// Historial propio (usuario) //probar con usuario normal
 router.get(
     "/bans/me",
     protect,
@@ -47,7 +49,7 @@ router.post(
     addStrike
 );
 
-// Historial propio
+// Historial propio //probar con usuario normal
 router.get(
     "/strikes/me",
     protect,
@@ -75,6 +77,7 @@ router.get(
 router.post(
     "/appeals",
     protect,
+    checkBan,
     createAppeal
 );
 

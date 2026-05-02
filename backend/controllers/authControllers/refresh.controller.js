@@ -22,13 +22,13 @@ const refreshToken = async (req, res) => {
         // Verificamos si el usuario se encuentra o no se encuentra baneado del blog
         const ban = await isUserBanned(user._id);
 
-        if (ban) {
-            return res.status(403).json({ message: "Usuario Baneado", reason: ban.reason });
-        }
-
         const newAccessToken = generateAccessToken(user._id, user.role);
 
-        res.json({ accessToken: newAccessToken });
+        res.json({ 
+            accessToken: newAccessToken,
+            isBanned: !!ban,
+            banInfo: ban || null
+        });
     } catch (error) {
         res.status(403).json({ message: "Refresh Token expirado o inválido" });
     }

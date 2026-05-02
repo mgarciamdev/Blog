@@ -42,15 +42,6 @@ const loginUser = async (req, res) => {
         // Verificamos si está baneado
         const ban = await isUserBanned(user._id);
 
-        if (ban) {
-            return res.status(403).json({
-                message: "Tu cuenta está baneada",
-                reason: ban.reason,
-                type: ban.type,
-                expiresAt: ban.expiresAt
-            });
-        }
-
         // Tokens
         const accessToken = generateAccessToken(user._id, user.role);
         const refreshToken = generateRefreshToken(user._id);
@@ -71,7 +62,9 @@ const loginUser = async (req, res) => {
                 role: user.role,
             },
             accessToken,
-            refreshToken
+            refreshToken,
+            isBanned: !!ban,
+            banInfo: ban || null
         });
 
     } catch (error) {

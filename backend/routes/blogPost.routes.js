@@ -1,25 +1,26 @@
 const express = require("express");
 const router = express.Router();
 
-const { 
-    createPost, 
-    updatePost, 
-    deletePost, 
-    getAllPosts, 
-    getPostBySlug, 
-    getPostByTag, 
-    searchPosts, 
-    getTopPosts, 
-    incrementView, 
-    likePost, 
-    dislikePost, 
-    savePost, 
-    unSavePost, 
-    getSavedPosts 
+const {
+    createPost,
+    updatePost,
+    deletePost,
+    getAllPosts,
+    getPostBySlug,
+    getPostByTag,
+    searchPosts,
+    getTopPosts,
+    incrementView,
+    likePost,
+    dislikePost,
+    savePost,
+    unSavePost,
+    getSavedPosts
 } = require("../controllers/blogPostControllers/index");
 
 const { protect } = require("../middlewares/authMiddleware");
 const { authorize } = require("../middlewares/authorizeMiddleware");
+const { blockIfBanned } = require("../middlewares/blockIfBanned");
 
 /**
  * POST CORE
@@ -82,12 +83,14 @@ router.post(
 router.post(
     "/:id/likes",
     protect,
+    blockIfBanned,
     likePost
 );
 
 router.post(
     "/:id/dislikes",
     protect,
+    blockIfBanned,
     dislikePost
 );
 
@@ -97,12 +100,14 @@ router.post(
 router.post(
     "/:id/save",
     protect,
+    blockIfBanned,
     savePost
 );
 
 router.delete(
     "/:id/save",
     protect,
+    blockIfBanned,
     unSavePost
 );
 
