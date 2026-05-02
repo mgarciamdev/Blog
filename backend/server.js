@@ -40,11 +40,11 @@ app.use("/api/moderation", moderationRoutes);
 app.use("/api/posts", blogPostRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-// app.use("/api/ai", aiRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
-// app.use("/api/feedback", feedbackRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 // Server uploads folder
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
