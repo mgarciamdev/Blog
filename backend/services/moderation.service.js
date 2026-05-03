@@ -14,15 +14,30 @@ const getModerationStatsByUser = async (userId) => {
     const bans = await Ban.find({ user: userId });
 
     const strikesStatsAgg = await Strike.aggregate([
-        { $match: { user: userId } },
+        { 
+            $match: { 
+                user: new mongoose.Types.ObjectId(userId) 
+            } 
+        },
         {
             $group: {
                 _id: null,
                 totalStrikes: { $sum: 1 },
+
                 activeStrikes: {
                     $sum: {
                         $cond: [
-                            { $eq: ["status", "activo"] },
+                            { $eq: ["$status", "activo"] },
+                            1,
+                            0
+                        ]
+                    }
+                },
+
+                totalPoints: {
+                    $sum: {
+                        $cond: [
+                            { $eq: ["$status", "activo"] },
                             "$points",
                             0
                         ]

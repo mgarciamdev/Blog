@@ -1,6 +1,7 @@
 const User = require("../../models/User");
 const crypto = require("crypto");
 const sendEmail = require("../../utils/sendEmail");
+const { sendVerificationEmail } = require("../../utils/emailHelper");
 
 // @desc    Obtiene el Token de verificación y redirecciona a verify en el frontend
 // @route   POST /api/auth/verify/:token
@@ -40,14 +41,14 @@ const retryVerify = async (req, res) => {
         const user = await User.findOne({ email: normalizedEmail });
 
         if (!user) {
-            return res.status(200).json({ 
-                message: "Si el email existe, se enviará un nuevo enlace" 
+            return res.status(200).json({
+                message: "Si el email existe, se enviará un nuevo enlace"
             });
         }
 
         if (user.isVerified) {
-            return res.status(400).json({ 
-                message: "Usuario ya verificado" 
+            return res.status(400).json({
+                message: "Usuario ya verificado"
             });
         }
 
@@ -61,12 +62,15 @@ const retryVerify = async (req, res) => {
 
         await sendVerificationEmail(user, retryToken);
 
-        res.json({ 
-            message: "Se envio un nuevo correo de verificación" 
+        res.json({
+            message: "Se envio un nuevo correo de verificación"
         });
 
     } catch (error) {
-        res.status(500).json({ message: "Error del Servidor" });
+        res.status(500).json({ 
+            message: "Error al enviar nuevo correo de confirmación",
+            error: error.message
+        });
     }
 };
 
