@@ -5,6 +5,7 @@ const createUpload = ({ folder, allowedTypes, maxSize }) => {
     // Configurar almacenamiento
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
+            req.uploadFolder = folder;
             cb(null, `uploads/${folder}`);
         },
         filename: (req, file, cb) => {

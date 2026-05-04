@@ -12,7 +12,7 @@ const blogPostRoutes = require("./routes/blogPost.routes");
 const commentRoutes = require("./routes/comment.routes");
 const dashboardRoutes = require("./routes/dashboard.routes");
 const aiRoutes = require("./routes/ai.routes");
-
+const uploadRoutes = require("./routes/upload.routes");
 const userRoutes = require("./routes/user.routes");
 const feedbackRoutes = require("./routes/feedback.routes");
 
@@ -41,7 +41,7 @@ app.use("/api/posts", blogPostRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/ai", aiRoutes);
-
+app.use("/api/upload", uploadRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/feedback", feedbackRoutes);
