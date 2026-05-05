@@ -26,19 +26,29 @@ Backend completo para una plataforma de blogs con sistema de moderación avanzad
 - 🤖 Integración con IA (Google Gemini API)
   - Generación de posts
   - Generación de contenido (Ideas)
-  - Generación de Respuesta a comentarios
+  - Generación de respuesta a comentarios
   - Generación de resumen del post
 - 📊 Dashboard dinámico con estadísticas
 - 📤 Subida de archivos (imágenes, PDFs) con validación
 - 🛡️ Middleware de seguridad (validación, control de baneos, etc.)
 
 ---
+## 🧠 Arquitectura
+
+El proyecto sigue una arquitectura modular basada en:
+
+- Controllers
+- Services (lógica de negocio)
+- Middlewares
+- Models (Mongoose)
+- Utils reutilizables
+---
 
 ## 🛠️ Tecnologías utilizadas
 
 - Node.js
 - Express
-- MongoDB + mongoose
+- MongoDB + Mongoose
 - JSON Web Tokens (JWT)
 - Multer (upload de archivos)
 - Google Gemini API (IA)
@@ -49,18 +59,19 @@ Backend completo para una plataforma de blogs con sistema de moderación avanzad
 
 ## 📁 Estructura del proyecto
 
-backend/<br>
-│<br> 
-├── config/<br>
-├── controllers/<br>
-├── middlewares/<br>
-├── models/<br>
-├── routes/<br>
-├── scripts/<br>
-├── services/<br>
-├── uploads/<br>
-└── utils/<br>
+```bash
+backend/
+├── config/
+├── controllers/
+├── middlewares/
+├── models/
+├── routes/
+├── scripts/
+├── services/
+├── uploads/
+└── utils/
 server.js
+```
 
 ---
 
@@ -125,7 +136,7 @@ Con validación de:
 ### Posts
 - GET `/api/posts`
 - POST `/api/posts`
-- PUT `/api/posts/:id`
+- T `/api/posts/:id`
 - DELETE `/api/posts/:id`
 
 ### Comments
@@ -151,7 +162,7 @@ Con validación de:
 ## ⚙️ Instalación
 
 ```bash
-git https://github.com/mgarciamdev/Blog.git
+git clone https://github.com/mgarciamdev/Blog.git
 cd blog/backend
 npm install
 ```
@@ -170,7 +181,6 @@ JWT_REFRESH_SECRET=tu_refresh_secret
 GEMINI_API_KEY=tu_api_key
 
 SUPERADMIN_EMAIL=tu_superadmin_email
-SUPERADMIN_PASSWORD=tu_superadmin_password
 
 EMAIL_USER=tu_user_email
 EMAIL_PASSWORD=tu_user_password
@@ -180,9 +190,9 @@ EMAIL_PASSWORD=tu_user_password
 ## 🔐 Generar secretos seguros
 
 Para JWT_SECRET y JWT_REFRESH_SECRET
-
+```
 node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
-
+```
 ---
 
 ## 👑 Gestión de SuperAdmin
@@ -207,7 +217,7 @@ node scripts/resetSuperAdmin.js
 ### ⚠️ Seguridad
 
 - Ejecutar solo en entornos seguros
-- No exponer como endpoint públic
+- No exponer como endpoint público
 
 ---
 
