@@ -7,7 +7,7 @@
 ![Status](https://img.shields.io/badge/Status-Active-success)
 
 Backend completo para una plataforma de blogs con sistema de moderación avanzada, autenticación segura e integración de inteligencia artificial.
-> ⚠️ Este proyecto corresponde únicamente al backend. El frontend será implementado posteriormente.
+> ⚠️ Este proyecto corresponde únicamente al backend. El frontend se esta implementado, 👷‍♂️ trabajo en proceso.
 
 ---
 
