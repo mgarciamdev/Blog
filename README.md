@@ -1,6 +1,13 @@
 # Blog Platform Backend API (Node.js, Express, MongoDB)
+![Node.js](https://img.shields.io/badge/Node.js-18+-green)
+![Express](https://img.shields.io/badge/Express.js-Backend-black)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)
+![JWT](https://img.shields.io/badge/Auth-JWT-blue)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+![Status](https://img.shields.io/badge/Status-Active-success)
 
 Backend completo para una plataforma de blogs con sistema de moderación avanzada, autenticación segura e integración de inteligencia artificial.
+> ⚠️ Este proyecto corresponde únicamente al backend. El frontend será implementado posteriormente.
 
 ---
 
@@ -42,15 +49,18 @@ Backend completo para una plataforma de blogs con sistema de moderación avanzad
 
 ## 📁 Estructura del proyecto
 
-src/<br>
+backend/<br>
 │<br> 
+├── config/<br>
 ├── controllers/<br>
+├── middlewares/<br>
 ├── models/<br>
 ├── routes/<br>
-├── middlewares/<br>
+├── scripts/<br>
 ├── services/<br>
-├── utils/<br>
-└── uploads/<br>
+├── uploads/<br>
+└── utils/<br>
+server.js
 
 ---
 
@@ -73,7 +83,8 @@ Incluye:
 - Auto-ban al superar límite
 - Bans temporales y permanentes
 - Sistema de apelaciones
-- Dashboard con métricas globales y por usuario
+- Dashboard dinamico con métricas globales y por usuario
+- Bloqueo de funcionalidades si hay ban
 
 ---
 
@@ -81,8 +92,9 @@ Incluye:
 
 Integración con Google Gemini para:
 
-- Generación automática de posts
+- Generación automática de ideas
 - Generación de contenido basado en prompts
+- Generación de resumenes
 - Respuestas inteligentes
 
 ---
@@ -117,7 +129,7 @@ Con validación de:
 - DELETE `/api/posts/:id`
 
 ### Comments
-- POST `/api/comments`
+- POST `/api/comments/:id`
 - DELETE `/api/comments/:id`
 
 ### Moderation
@@ -127,8 +139,8 @@ Con validación de:
 - GET `/api/moderation/users/:id/timeline`
 
 ### AI
-- POST `/api/ai/generate-post`
-- POST `/api/ai/generate-content`
+- POST `/api/ai/generate`
+- POST `/api/ai/generate-ideas`
 
 ### Uploads
 - POST `/api/uploads/users/profiles`
@@ -150,7 +162,6 @@ npm install
 
 Crea un archivo ```.env``` con:
 
-#### .env
 ```
 PORT=8000
 MONGO_URI=tu_mongodb_uri
@@ -161,10 +172,43 @@ GEMINI_API_KEY=tu_api_key
 SUPERADMIN_EMAIL=tu_superadmin_email
 SUPERADMIN_PASSWORD=tu_superadmin_password
 
-envio de correo con nodemailer
 EMAIL_USER=tu_user_email
 EMAIL_PASSWORD=tu_user_password
 ```
+---
+
+## 🔐 Generar secretos seguros
+
+Para JWT_SECRET y JWT_REFRESH_SECRET
+
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+
+---
+
+## 👑 Gestión de SuperAdmin
+### 🆕 Crear superadmin (primera instalación)
+
+```bash
+node scripts/createSuperAdmin.js
+```
+- Crea el primer usuario con rol ``superadmin``
+- Solicita email y contraseña
+- Aplica validación de seguridad
+
+### 🆕 Resetear superadmin
+
+```bash
+node scripts/resetSuperAdmin.js
+```
+- Elimina al usuario con rol ``superadmin``
+- Crea uno nuevo desde cero
+- Solicita email y contraseña
+
+### ⚠️ Seguridad
+
+- Ejecutar solo en entornos seguros
+- No exponer como endpoint públic
+
 ---
 
 ## ▶️ Ejecución
@@ -189,6 +233,6 @@ npm run dev
 
 ## 👨‍💻 Autor
 
-Desarrollado por Mario Rubén García Monzón
+Desarrollado por mgarciamdev
 
 ---
