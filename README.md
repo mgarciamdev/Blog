@@ -136,7 +136,7 @@ Con validación de:
 ### Posts
 - GET `/api/posts`
 - POST `/api/posts`
-- T `/api/posts/:id`
+- PUT `/api/posts/:id`
 - DELETE `/api/posts/:id`
 
 ### Comments
@@ -195,29 +195,54 @@ node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 ---
 
-## 👑 Gestión de SuperAdmin
-### 🆕 Crear superadmin (primera instalación)
+## 🛠️ CLI de Administración
+
+El proyecto incluye una herramienta CLI para gestionar tareas administrativas desde consola.
+
+### 📦 Uso básico
 
 ```bash
-node scripts/createSuperAdmin.js
+npm run cli <comando>
+```
+
+### 🚀 Comandos disponibles
+
+Crear SuperAdmin
+
+```bash
+npm run cli create-superadmin
 ```
 - Crea el primer usuario con rol ``superadmin``
-- Solicita email y contraseña
-- Aplica validación de seguridad
+- Solicita:
+  - Email
+  - Nombre
+  - Bio (opcional)
+  - Contraseña segura
 
-### 🆕 Resetear superadmin
+Resetear SuperAdmin
 
 ```bash
-node scripts/resetSuperAdmin.js
+npm run cli reset-superadmin
 ```
-- Elimina al usuario con rol ``superadmin``
+- Elimina el usuario con rol ``superadmin`` actual
 - Crea uno nuevo desde cero
-- Solicita email y contraseña
 
-### ⚠️ Seguridad
+### ⚡ Uso avanzado
+
+```bash
+npx blog-cli create-superadmin
+```
+
+### 🔐 Seguridad
+
+- Contraseñas hasheadas con bcrypt
+- No se almacenan en ``.env``
+- No se exponen en logs
+
+### ⚠️ Recomendaciones
 
 - Ejecutar solo en entornos seguros
-- No exponer como endpoint público
+- No exponer como endpoint HTTP
 
 ---
 
