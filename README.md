@@ -244,6 +244,20 @@ npx blog-cli create-superadmin
 - Ejecutar solo en entornos seguros
 - No exponer como endpoint HTTP
 
+### 👑 Gestión de SuperAdmin
+
+### 🆕 Crear superadmin (primera instalación)
+
+```bash
+npm run cli create-superadmin
+```
+
+### 🔄 Resetear superadmin
+
+```bash
+npm run cli reset-superadmin
+```
+
 ---
 
 ## ▶️ Ejecución
