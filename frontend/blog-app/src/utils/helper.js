@@ -10,3 +10,7 @@ export const getInitials = (title) => {
 
     return initials.toUpperCase();
 };
+
+export const isAdminRole = (role) => {
+    return ["admin", "superadmin"].includes(role);
+};

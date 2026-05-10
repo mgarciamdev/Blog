@@ -9,21 +9,24 @@ import Dashboard from "./pages/Admin/Dashboard";
 import BlogPostEditor from "./pages/Admin/BlogPostEditor";
 import BlogPosts from "./pages/Admin/BlogPosts";
 import Comments from "./pages/Admin/Comments";
-import AdminLogin from "./pages/Admin/AdminLogin";
+import Login from "./components/Auth/Login";
+import SignUp from "./components/Auth/SignUp";
 
 const App = () => {
   return (
     <div>
       <Router>
         <Routes>
-          {/* Rutas predeterminadas */}
+          {/* Rutas publicas */}
           <Route path="/" element={<BlogLandingPage />} />
-          <Route path="/:slug" element={<BlogPostView />} />
-          <Route path="/tag/:tagName" element={<PostByTags />} />
+          <Route path="/posts/:slug" element={<BlogPostView />} />
+          <Route path="/tags/:tagName" element={<PostByTags />} />
           <Route path="/search" element={<SearchPosts />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
 
           {/* Rutas Privadas del Administrador */}
-          <Route element={<PrivateRoute allowedRoles={["admin"]} />}>
+          <Route element={<PrivateRoute allowedRoles={["admin", "superadmin"]} />}>
             <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/admin/posts" element={<BlogPosts />} />
             <Route path="/admin/create" element={<BlogPostEditor />} />
@@ -40,7 +43,7 @@ const App = () => {
           </Route>
 
           {/* Rutas para inicio de Sesión o Creación de Cuenta */}
-          <Route path="/admin-login" element={<AdminLogin />} />
+
         </Routes>
       </Router>
 

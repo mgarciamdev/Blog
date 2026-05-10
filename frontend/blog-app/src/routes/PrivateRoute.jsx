@@ -1,8 +1,21 @@
-import React from 'react'
-import { Outlet } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { Navigate, Outlet } from 'react-router-dom'
+import { UserContext } from '../context/userContext';
 
 const PrivateRoute = ({ allowedRoles }) => {
-    // Se implementara posteriormente
+    const {user, loading} = useContext(UserContext);
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!user) {
+        return <Navigate to="/" replace />
+    }
+
+    if (!user?.role || !allowedRoles.includes(user.role)) {
+        return <Navigate to="/" replace/>
+    }
     return <Outlet />;
 };
 
