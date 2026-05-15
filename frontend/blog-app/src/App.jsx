@@ -27,7 +27,6 @@ const App = () => {
 
           {/* Rutas Privadas del Administrador */}
           <Route element={<PrivateRoute allowedRoles={["admin", "superadmin"]} />}>
-            <Route path="/admin/dashboard" element={<Dashboard />} />
             <Route path="/admin/posts" element={<BlogPosts />} />
             <Route path="/admin/create" element={<BlogPostEditor />} />
             <Route
@@ -42,6 +41,10 @@ const App = () => {
 
           </Route>
 
+          {/* DASHBOARD */}
+          <Route element={<PrivateRoute allowedRoles={["member", "admin", "superadmin"]} />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Route>
           {/* Rutas para inicio de Sesión o Creación de Cuenta */}
 
         </Routes>

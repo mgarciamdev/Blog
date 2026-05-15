@@ -14,3 +14,8 @@ export const getInitials = (title) => {
 export const isAdminRole = (role) => {
     return ["admin", "superadmin"].includes(role);
 };
+
+export const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+};

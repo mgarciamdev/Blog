@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react'
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { LuSearch } from 'react-icons/lu';
 import { BLOG_NAVBAR_DATA } from '../../../utils/data';
 
@@ -17,6 +17,7 @@ const BlogNavbar = ({ activeMenu }) => {
     const [openProfileMenu, setOpenProfileMenu] = useState(false) /* nuevo Const */
 
     const { user, clearUser } = useContext(UserContext);
+    const navigate = useNavigate();
 
     const handleLogout = () => {
         clearUser();
@@ -96,6 +97,7 @@ const BlogNavbar = ({ activeMenu }) => {
                             <button
                                 className="flex items-center justify-center gap-3 bg-linear-to-r from-green-500 to-emerald-400 text-xs md:text-xs font-semibold text-white
                                 px-4 md:px-4 py-1 rounded-lg hover:bg-black hover:text-white transition-colors cursor-pointer hover:shadow-2xl hover:shadow-emerald-200"
+                                onClick={() => navigate("/login")}
                             >
                                 Login
                             </button>
