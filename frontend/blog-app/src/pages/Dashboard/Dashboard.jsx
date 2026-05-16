@@ -5,6 +5,7 @@ import { API_PATHS } from '../../utils/apiPaths';
 import { isAdminRole } from '../../utils/helper';
 import DashboardLayout from '../../components/Layouts/DashboardLayout';
 import DashboardHeader from './sections/DashboardHeader';
+import OverviewSection from './sections/OverViewSection';
 
 const Dashboard = () => {
   const { user } = useContext(UserContext);
@@ -47,6 +48,8 @@ const Dashboard = () => {
     <DashboardLayout activeMenu={"Dashboard"}>
       <>
         <DashboardHeader user={user} />
+
+        <OverviewSection stats={dashboardData?.stats} />
       </>
     </DashboardLayout>
   )
