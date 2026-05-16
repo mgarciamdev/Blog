@@ -12,7 +12,7 @@ const PassowordField = ({ password, setPassword }) => {
         /[a-z]/.test(password),
         /[0-9]/.test(password),
         /[!@#$%^&*(),.?":{}|<>]/.test(password),
-        password.length >= 8,
+        password.length >= 12,
     ].every(Boolean);
 
     return (
@@ -24,7 +24,7 @@ const PassowordField = ({ password, setPassword }) => {
                     if (!touched) setTouched(true);
                 }}
                 label="Password"
-                placeholder="Min 8 caracteres"
+                placeholder="Min 12 caracteres"
                 type="password"
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}

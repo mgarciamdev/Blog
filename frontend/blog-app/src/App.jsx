@@ -5,7 +5,7 @@ import BlogPostView from "./pages/Blog/BlogPostView";
 import PostByTags from "./pages/Blog/PostByTags";
 import SearchPosts from "./pages/Blog/SearchPosts";
 import PrivateRoute from "./routes/PrivateRoute";
-import Dashboard from "./pages/Admin/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard";
 import BlogPostEditor from "./pages/Admin/BlogPostEditor";
 import BlogPosts from "./pages/Admin/BlogPosts";
 import Comments from "./pages/Admin/Comments";

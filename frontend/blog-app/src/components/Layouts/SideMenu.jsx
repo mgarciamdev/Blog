@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
     BLOG_NAVBAR_DATA,
     ADMIN_SIDE_MENU,
@@ -10,18 +10,18 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
 import { useMemo } from 'react';
 import CharAvatar from '../Cards/CharAvatar';
+import { isAdminRole } from '../../utils/helper';
+import { UserContext } from '../../context/userContext';
+import axiosInstance from '../../utils/axiosInstance';
+import { API_PATHS } from '../../utils/apiPaths';
 
 const SideMenu = ({ activeMenu, isBlogMenu }) => {
     const location = useLocation();
-    const user = null
+    const { user, clearUser } = useContext(UserContext);
     const [openMenu, setOpenMenu] = useState(() => []);
     const navigate = useNavigate();
 
     const handleClick = (route) => {
-        //Redirección especial para el dashboard segun el rol que inicio sesion
-        if (route.toLowerCase().includes("dashboard")) {
-            route = true?.role === "admin" ? "/admin/dashboard" : "/blog/dashboard";
-        }
 
         if (route === "logout") {
             handleLogout();
@@ -31,23 +31,40 @@ const SideMenu = ({ activeMenu, isBlogMenu }) => {
         navigate(route);
     };
 
-    const handleLogout = () => {
-        localStorage.clear();
+    const handleLogout = async () => {
+        try {
+            await axiosInstance.post(API_PATHS.AUTH.LOGOUT);
+        } catch (error) {
+            console.error("Error al cerrar sesión: ", error)
+        } finally {
+            clearUser();
 
-        navigate("/", { replace: true });
+            navigate("/", {
+                replace: true
+            });
+        }
     }
 
     // Combinamos los menús segun el contexto
     const finalMenu = useMemo(() => {
         if (isBlogMenu) {
             let menu = [...BLOG_NAVBAR_DATA];
+
             if (user) {
-                menu = [...menu, ...BLOG_USER_EXTRA_MENU];
+                menu = [
+                    ...menu,
+                    ...BLOG_USER_EXTRA_MENU
+                ];
             }
+
             return menu;
-        } else {
-            return user?.role === "admin" ? ADMIN_SIDE_MENU : MEMBER_SIDE_MENU;
+
         }
+
+        return isAdminRole(user?.role)
+            ? ADMIN_SIDE_MENU
+            : MEMBER_SIDE_MENU;
+
     }, [isBlogMenu, user]);
 
     const toggleMenu = (id) => {
@@ -74,7 +91,7 @@ const SideMenu = ({ activeMenu, isBlogMenu }) => {
 
 
     return (
-        <div className="w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 p-5 fixed top-[49px] z-20">
+        <div className="w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 p-5 sticky top-12.25 z-20">
             {user && (
                 <div className="flex flex-col items-center justify-center gap-1 mt-3 mb-7">
                     {user?.profileImageUrl ? (
@@ -84,7 +101,7 @@ const SideMenu = ({ activeMenu, isBlogMenu }) => {
                             className="w-20 h-20 bg-slate-400 rounded-full"
                         />
                     ) : (
-                        <CharAvatar 
+                        <CharAvatar
                             fullName={user?.name || ""}
                             width="w-20"
                             height="h-20"
@@ -150,7 +167,7 @@ const SideMenu = ({ activeMenu, isBlogMenu }) => {
 
             {/* Logout */}
             {user && (
-                <button 
+                <button
                     className={`w-full flex items-center gap-4 text-[15px] py-3 px-6 rounded-lg mb-3 cursor-pointer`}
                     onClick={() => handleLogout()}
                 >

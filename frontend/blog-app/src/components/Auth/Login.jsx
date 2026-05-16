@@ -88,7 +88,7 @@ const Login = () => {
             replace: true,
           });
         } else {
-          navigate("/", {
+          navigate("/dashboard", {
             replace: true,
           });
         }

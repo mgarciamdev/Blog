@@ -21,8 +21,8 @@ const PasswordRequirements = ({ password }) => {
             valid: /[!@#$%^&*(),.?":{}|<>]/.test(password),
         },
         {
-            label: "8 caracteres o mas",
-            valid: password.length >= 8,
+            label: "minimo 12 caracteres",
+            valid: password.length >= 12,
         },
     ];
 
