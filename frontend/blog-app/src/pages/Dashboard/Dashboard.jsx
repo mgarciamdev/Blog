@@ -12,7 +12,6 @@ const Dashboard = () => {
   const { user } = useContext(UserContext);
 
   const [dashboardData, setDashboardData] = useState(null);
-  const [maxViews, setMaxViews] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -29,10 +28,6 @@ const Dashboard = () => {
 
       setDashboardData(data);
 
-      const topPosts = data?.topPosts || [];
-      const totalViews = Math.max(...topPosts.map((post) => post.views || 0), 1);
-
-      setMaxViews(totalViews);
     } catch (error) {
       error.response?.data?.message ||
         "Error al cargar dashboard"

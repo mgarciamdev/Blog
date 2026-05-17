@@ -1,5 +1,6 @@
 import React from 'react'
 import TagInsights from '../components/TagInsights';
+import TopPostSection from '../components/TopPostSection';
 
 const AdminInsightsSection = ({ tagUsage, topPosts }) => {
     return (
@@ -12,6 +13,16 @@ const AdminInsightsSection = ({ tagUsage, topPosts }) => {
                 </div>
 
                 <TagInsights tagUsage={tagUsage} />
+            </div>
+
+            <div className="col-span-12 md:col-span-5 bg-white p-6 rounded-2xl shadow-sm shadow-gray-100 border border-gray-200/50">
+                <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-gray-900">
+                        Top Posts
+                    </h3>
+                </div>
+
+                <TopPostSection posts={topPosts} />
             </div>
         </div>
     );
