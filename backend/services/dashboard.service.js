@@ -90,7 +90,9 @@ const getSuperAdminDashboard = async () => {
         User.countDocuments(),
         User.countDocuments({ isVerified: true }),
         User.countDocuments({ isVerified: false }),
+        User.countDocuments({ role: "superadmin" }),
         User.countDocuments({ role: "admin" }),
+        User.countDocuments({ role: "member" }),
         Feedback.countDocuments({ status: "pending" })
     ]);
 
@@ -109,8 +111,10 @@ const getSuperAdminDashboard = async () => {
             totalUsers,
             verifiedUsers,
             unVerifiedUsers,
+            superadmin,
             admins,
-            unreadFeedbacks
+            member,
+            unreadFeedbacks,
         },
         tagUsage,
         moderation
