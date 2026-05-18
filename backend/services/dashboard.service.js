@@ -84,7 +84,9 @@ const getSuperAdminDashboard = async () => {
         totalUsers,
         verifiedUsers,
         unVerifiedUsers,
+        superadmin,
         admins,
+        members,
         unreadFeedbacks
     ] = await Promise.all([
         User.countDocuments(),
@@ -113,7 +115,7 @@ const getSuperAdminDashboard = async () => {
             unVerifiedUsers,
             superadmin,
             admins,
-            member,
+            members,
             unreadFeedbacks,
         },
         tagUsage,
