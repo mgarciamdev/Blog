@@ -51,6 +51,7 @@ const Dashboard = () => {
           <AdminInsightsSection
             tagUsage={dashboardData?.tagUsage || []}
             topPosts={dashboardData?.topPosts || []}
+            stats={dashboardData?.stats}
           />
         )}
       </>

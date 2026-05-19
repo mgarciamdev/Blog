@@ -1,11 +1,31 @@
 import React from 'react'
 import TagInsights from '../components/TagInsights';
-import TopPostSection from '../components/TopPostSection';
+import TopPostSection from './TopPostSection';
+import EngagementSection from './EngagementSection';
+import VerificationSection from './verificationSection';
+import RoleDistributionSection from './RoleDistributionSection';
 
-const AdminInsightsSection = ({ tagUsage, topPosts }) => {
+const AdminInsightsSection = ({ tagUsage, topPosts, stats }) => {
+
+    const hasTopPosts = topPosts?.length > 0;
+
+    const hasEngagement =
+        stats?.totalViews > 0 ||
+        stats?.totalLikes > 0 ||
+        stats?.totalComments > 0 ||
+        stats?.totalDislikes > 0;
+
+    const hasVerification =
+        stats?.verifiedUsers > 0 ||
+        stats?.unVerifiedUsers > 0;
+
+    const hasRoles = 
+        stats?.admins > 0 ||
+        stats?.totalUsers > 0;
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 my-4 md:my-6">
-            <div className="col-span-12 md:col-span-7 bg-white p-6 rounded-2xl shadow-md shadow-gray-100 border border-gray-200/50">
+            <div className="col-span-12 md:col-span-6 bg-white p-6 rounded-2xl shadow-md shadow-gray-100 border border-gray-200/50">
                 <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-gray-900">
                         Tag Insights
@@ -15,15 +35,53 @@ const AdminInsightsSection = ({ tagUsage, topPosts }) => {
                 <TagInsights tagUsage={tagUsage} />
             </div>
 
-            <div className="col-span-12 md:col-span-5 bg-white p-6 rounded-2xl shadow-sm shadow-gray-100 border border-gray-200/50">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-semibold text-gray-900">
-                        Top Posts
-                    </h3>
-                </div>
+            {hasTopPosts && (
+                <div className="col-span-12 md:col-span-6 bg-white p-6 rounded-2xl shadow-sm shadow-gray-100 border border-gray-200/50">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-semibold text-gray-900">
+                            Top Posts
+                        </h3>
+                    </div>
 
-                <TopPostSection posts={topPosts} />
-            </div>
+                    <TopPostSection posts={topPosts} />
+                </div>
+            )}
+
+            {hasEngagement && (
+                <div className="col-span-12 md:col-span-3 bg-white p-6 rounded-2xl shadow-sm shadow-gray-100 border border-gray-200/50">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-gray-900 mb-4">
+                            Engagement
+                        </h3>
+                    </div>
+
+                    <EngagementSection stats={stats} />
+                </div>
+            )}
+
+            {hasVerification && (
+                <div className="col-span-12 md:col-span-3 bg-white p-6 rounded-2xl shadow-sm shadow-gray-100 border border-gray-200/50">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-gray-900 mb-4">
+                            User Verification Status
+                        </h3>
+                    </div>
+
+                    <VerificationSection stats={stats} />
+                </div>
+            )}
+
+            {hasRoles && (
+                <div className="col-span-12 md:col-span-3 bg-white p-6 rounded-2xl shadow-sm shadow-gray-100 border border-gray-200/50">
+                    <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-gray-900 mb-4">
+                            Rol Distribution
+                        </h3>
+                    </div>
+
+                    <RoleDistributionSection stats={stats} />
+                </div>
+            )}
         </div>
     );
 };

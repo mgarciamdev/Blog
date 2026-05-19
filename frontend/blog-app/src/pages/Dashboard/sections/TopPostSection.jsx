@@ -1,5 +1,5 @@
 import React from 'react'
-import TopPostCard from '../../../components/Cards/TopPostCard';
+import TopPostCard from '../components/TopPostCard';
 
 const TopPostSection = ({ posts = [] }) => {
     const maxViews = Math.max(...posts.map((post) => post.views || 0), 1);
