@@ -48,7 +48,7 @@ const getAdminDashboard = async () => {
     const recentComments = await Comment.find()
         .sort({ createdAt: -1 })
         .limit(5)
-        .populate("author", "name profileImageUrl")
+        .populate("author", "name profileImageUrl role")
         .populate("post", "title coverImageUrl");
 
     const tagUsage = await BlogPost.aggregate([
