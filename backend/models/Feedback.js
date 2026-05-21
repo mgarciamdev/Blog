@@ -13,7 +13,7 @@ const FeedBackSchema = new mongoose.Schema(
             respondedAt: { type: Date }
         }
     },
-    { timeseries: true }
+    { timestamps: true }
 );
 
 module.exports = mongoose.model("Feedback", FeedBackSchema);
