@@ -19,3 +19,24 @@ export const validateEmail = (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
 };
+
+export const roleStyles = {
+    superadmin: {
+        label: "System",
+        className: "bg-red-100 text-red-700",
+    },
+    admin: {
+        label: "Admin",
+        className: "bg-emerald-100 text-emerald-700",
+    },
+    member: {
+        label: "Member",
+        className: "bg-sky-100 text-sky-700",
+    },
+};
+
+export const roleAvatarStyles = {
+    superadmin: "ring-red-200",
+    admin: "ring-emerald-200",
+    member: "ring-sky-200",
+};

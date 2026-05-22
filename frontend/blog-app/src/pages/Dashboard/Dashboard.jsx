@@ -7,6 +7,7 @@ import DashboardLayout from '../../components/Layouts/DashboardLayout';
 import DashboardHeader from './sections/DashboardHeader';
 import OverviewSection from './sections/OverViewSection';
 import AdminInsightsSection from './sections/AdminInsightsSection';
+import MemberInsightsSection from './sections/MemberInsightsSection';
 
 const Dashboard = () => {
   const { user } = useContext(UserContext);
@@ -16,6 +17,7 @@ const Dashboard = () => {
   const [error, setError] = useState(null);
 
   const isAdmin = isAdminRole(user?.role);
+  const isMember = user?.role === "member";
 
   const getDashboardData = async () => {
     try {
@@ -51,6 +53,15 @@ const Dashboard = () => {
           <AdminInsightsSection
             tagUsage={dashboardData?.tagUsage || []}
             topPosts={dashboardData?.topPosts || []}
+            stats={dashboardData?.stats}
+            comments={dashboardData?.recentComments || []}
+          />
+        )}
+
+        {isMember && (
+          <MemberInsightsSection
+            saved={dashboardData?.recentSaved || []}
+            feedbacks={dashboardData?.recentFeedbacks || []}
             stats={dashboardData?.stats}
           />
         )}

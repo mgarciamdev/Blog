@@ -31,7 +31,7 @@ const DashboardHeader = ({ user }) => {
                 {/* Izquierda */}
                 <div>
                     <h2 className="text-xl font-semibold text-gray-900">
-                        {getGreeting()}, {user?.name}
+                        {getGreeting()}, {user?.username}
                     </h2>
 
                     <p className="text-sm text-gray-400 mt-1">
