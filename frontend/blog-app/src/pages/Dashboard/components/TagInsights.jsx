@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 import PieChartCard from '../../../components/Charts/PieChartCard';
+import { LuChartPie } from 'react-icons/lu';
+import EmptyState from '../../../components/EmptyState';
 
 const COLORS = [
     "#10b981",
@@ -56,6 +58,18 @@ const TagInsights = ({ tagUsage = [] }) => {
         return finalData;
 
     }, [tagUsage]);
+
+    if (!tagUsage?.length) {
+        return (
+            <div className="min-h-80 flex items-center justify-center">
+                <EmptyState
+                    icon={<LuChartPie />}
+                    title="No existen la analita de tags"
+                    description="Aquí aparecerán los datos de uso de los Tag."
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="grid grid-cols-12 mt-4">

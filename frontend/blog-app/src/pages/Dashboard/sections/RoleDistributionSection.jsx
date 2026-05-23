@@ -1,5 +1,7 @@
 import React from 'react'
 import RoleProgressCard from '../components/RoleProgressCard';
+import EmptyState from '../../../components/EmptyState';
+import { LuUser } from 'react-icons/lu';
 
 const RoleDistributionSection = ({ stats }) => {
 
@@ -20,6 +22,18 @@ const RoleDistributionSection = ({ stats }) => {
             color: "#0ea5e9",
         },
     ];
+
+    if (!roleData?.length) {
+    return (
+        <div className="min-h-80 flex items-center justify-center">
+            <EmptyState
+                icon={<LuUser />}
+                title="No hay datos de roles de usuarios"
+                description="Aquí aparecerán las estadisticas de roles de usuario."
+            />
+        </div>
+    );
+}
     
     return (
         <div className="grid grid-cols-5 mt-4">

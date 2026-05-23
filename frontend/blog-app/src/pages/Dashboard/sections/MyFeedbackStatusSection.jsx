@@ -23,11 +23,21 @@ const MyFeedbackStatusSection = ({ stats, feedbacks }) => {
 
     const lastResponseTime = latestResponded?.response?.respondedAt;
 
+    if (!feedbacks?.length) {
+        return (
+            <EmptyState
+                icon={<LuMessageSquareMore />}
+                title="No existen feedbacks todavia"
+                description="Los feedbacks apareceran aqui."
+            />
+        );
+    }
+
     return (
         <>
             <div className="grid grid-cols-3 gap-4">
                 <FeedbackStatusCard
-                    title="Total Feedbacks"
+                    title="Feedbacks"
                     value={stats?.myFeedbacks || 0}
                     icon={<LuMessageSquareMore />}
                     bgColor="bg-sky-100"
@@ -52,7 +62,7 @@ const MyFeedbackStatusSection = ({ stats, feedbacks }) => {
             </div>
             <div>
                 {lastResponseTime && (
-                    <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                    <div className="mt-6 flex items-center gap-2 text-sm text-gray-500">
                         <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
 
                         <span className="text-sm text-gray-500">

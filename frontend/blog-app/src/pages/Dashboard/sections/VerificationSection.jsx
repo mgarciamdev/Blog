@@ -1,7 +1,11 @@
 import React from 'react'
 import VerificationChart from '../components/VerificationChart';
+import EmptyState from '../../../components/EmptyState';
+import { LuShieldCheck } from 'react-icons/lu';
 
 const VerificationSection = ({ stats }) => {
+
+    const totalUsers = stats?.totalUsers || 0;
 
     const charData = [
         {
@@ -14,13 +18,25 @@ const VerificationSection = ({ stats }) => {
         },
     ];
 
+    if (totalUsers === 0) {
+        return (
+            <div className="min-h-80 flex items-center justify-center">
+                <EmptyState
+                    icon={<LuShieldCheck />}
+                    title="No hay datos de verificación"
+                    description="Aquí aparecerán las estadísticas de verificación de usuarios."
+                />
+            </div>
+        );
+    }
+
     return (
         <div className="grid grid-cols-5 mt-4">
             <div className="col-span-12 md:col-span-7">
-                <VerificationChart data={charData} totalUsers={stats?.totalUsers || 0} />
+                <VerificationChart data={charData} totalUsers={totalUsers} />
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default VerificationSection
+export default VerificationSection;
