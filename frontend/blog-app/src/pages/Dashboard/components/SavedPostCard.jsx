@@ -4,7 +4,7 @@ import { LuBookmark } from 'react-icons/lu';
 
 const SavedPostCard = ({ post, savedAt }) => {
     return (
-        <div className="flex items-center gap-4 p-3 rounded-2xl border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50/40 transition-all duration-300 cursor-pointer">
+        <div className="flex items-center gap-4 p-3 rounded-2xl border border-gray-100 transition-all duration-300 cursor-pointer bg-white hover:shadow-md">
             {/* Imagen */}
             {post?.coverImageUrl ? (
                 <img

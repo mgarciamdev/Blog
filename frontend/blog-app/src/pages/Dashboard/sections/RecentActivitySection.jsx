@@ -2,8 +2,9 @@ import moment from 'moment';
 import React from 'react'
 import { LuActivity, LuBadgeCheck, LuBookmark, LuMessageSquareMore } from 'react-icons/lu';
 import EmptyState from '../../../components/EmptyState';
+import ListSkeleton from '../../../components/Loaders/dashboard/ListSkeleton';
 
-const RecentActivitySection = ({ saved, feedbacks }) => {
+const RecentActivitySection = ({ saved, feedbacks, loading }) => {
     const savedActivities = saved.map((item) => ({
         id: item._id,
         type: "save",
@@ -34,6 +35,10 @@ const RecentActivitySection = ({ saved, feedbacks }) => {
 
     const limitedActivities = activities.slice(0, 3);
 
+    if (loading) {
+        return <ListSkeleton items={3} showImage/>;
+    }
+
     return (
         <div className="space-y-4">
             {!limitedActivities?.length ? (
@@ -46,7 +51,7 @@ const RecentActivitySection = ({ saved, feedbacks }) => {
                 limitedActivities.map((activity) => (
                     <div
                         key={activity.id}
-                        className="flex gap-4 p-4 rounded-2xl border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50/40 transition-all duration-300"
+                        className="flex gap-4 p-4 rounded-2xl border border-gray-100  transition-all duration-300 bg-white hover:shadow-md"
                     >
                         {/* ICONO */}
                         <div className="mt-1">

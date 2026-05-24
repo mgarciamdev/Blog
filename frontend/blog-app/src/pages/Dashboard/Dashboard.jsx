@@ -2,12 +2,12 @@ import React, { useContext, useEffect, useState } from 'react'
 import { UserContext } from '../../context/userContext'
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
-import { isAdminRole } from '../../utils/helper';
 import DashboardLayout from '../../components/Layouts/DashboardLayout';
 import DashboardHeader from './sections/DashboardHeader';
 import OverviewSection from './sections/OverViewSection';
 import AdminInsightsSection from './sections/AdminInsightsSection';
 import MemberInsightsSection from './sections/MemberInsightsSection';
+import SuperAdminInsightsSection from './sections/SuperAdminInsightsSection';
 
 const Dashboard = () => {
   const { user } = useContext(UserContext);
@@ -16,7 +16,8 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const isAdmin = isAdminRole(user?.role);
+  const isSuperAdmin = user?.role === "superadmin";
+  const isAdmin = user?.role === "admin";
   const isMember = user?.role === "member";
 
   const getDashboardData = async () => {
@@ -28,12 +29,15 @@ const Dashboard = () => {
 
       const data = response.data;
 
-      setDashboardData(data);
+      setTimeout(() => {
+        setDashboardData(data);
+        setLoading(false);
+      }, 1200);
 
     } catch (error) {
       error.response?.data?.message ||
         "Error al cargar dashboard"
-    } finally {
+      
       setLoading(false);
     }
   };
@@ -45,9 +49,17 @@ const Dashboard = () => {
   return (
     <DashboardLayout activeMenu={"Dashboard"}>
       <>
-        <DashboardHeader user={user} />
+        <DashboardHeader user={user} loading={loading} />
 
-        <OverviewSection stats={dashboardData?.stats} />
+        <OverviewSection stats={dashboardData?.stats} loading={loading} />
+
+        {isSuperAdmin && (
+          <SuperAdminInsightsSection
+            tagUsage={dashboardData?.tagUsage || []}
+            stats={dashboardData?.stats}
+            loading={loading}
+          />
+        )}
 
         {isAdmin && (
           <AdminInsightsSection
@@ -55,6 +67,7 @@ const Dashboard = () => {
             topPosts={dashboardData?.topPosts || []}
             stats={dashboardData?.stats}
             comments={dashboardData?.recentComments || []}
+            loading={loading}
           />
         )}
 
@@ -63,6 +76,7 @@ const Dashboard = () => {
             saved={dashboardData?.recentSaved || []}
             feedbacks={dashboardData?.recentFeedbacks || []}
             stats={dashboardData?.stats}
+            loading={loading}
           />
         )}
       </>

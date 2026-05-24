@@ -2,8 +2,13 @@ import React from 'react'
 import VerificationChart from '../components/VerificationChart';
 import EmptyState from '../../../components/EmptyState';
 import { LuShieldCheck } from 'react-icons/lu';
+import DonutChartSkeleton from '../../../components/Loaders/dashboard/DonutChartSkeleton';
 
-const VerificationSection = ({ stats }) => {
+const VerificationSection = ({ stats, loading }) => {
+
+    if (loading) {
+        return <DonutChartSkeleton />;
+    }
 
     const totalUsers = stats?.totalUsers || 0;
 

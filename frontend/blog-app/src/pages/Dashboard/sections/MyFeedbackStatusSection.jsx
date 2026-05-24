@@ -2,8 +2,10 @@ import React from 'react'
 import FeedbackStatusCard from '../components/FeedbackStatusCard'
 import { LuBadgeCheck, LuMessageCircleWarning, LuMessageSquareMore } from 'react-icons/lu'
 import moment from 'moment';
+import EmptyState from '../../../components/EmptyState';
+import FeedbackStatusSkeleton from '../../../components/Loaders/dashboard/FeedbackStatusSkeleton';
 
-const MyFeedbackStatusSection = ({ stats, feedbacks }) => {
+const MyFeedbackStatusSection = ({ stats, feedbacks, loading }) => {
 
     const pendingCount = feedbacks.filter(
         (item) => item.status === "pending"
@@ -22,6 +24,10 @@ const MyFeedbackStatusSection = ({ stats, feedbacks }) => {
         )[0];
 
     const lastResponseTime = latestResponded?.response?.respondedAt;
+
+    if (loading) {
+        return <FeedbackStatusSkeleton />;
+    }
 
     if (!feedbacks?.length) {
         return (

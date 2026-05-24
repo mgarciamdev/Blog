@@ -1,8 +1,13 @@
 import React from 'react'
 import { LuBell, LuBrain, LuBrainCircuit, LuChartLine, LuCheckCheck, LuCloud, LuDraftingCompass, LuHeart, LuHeartCrack, LuMail, LuMailCheck, LuNotepadText, LuPodcast, LuSave, LuUser } from 'react-icons/lu';
 import SummaryCard from '../components/SummaryCard';
+import OverviewSkeleton from '../../../components/Loaders/dashboard/OverviewSkeleton';
 
-const OverviewSection = ({ stats }) => {
+const OverviewSection = ({ stats, loading }) => {
+
+    if (loading) {
+        return <OverviewSkeleton cards={6} />;
+    }
 
     const cards = [];
 

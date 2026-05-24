@@ -2,8 +2,9 @@ import React from 'react'
 import EngagementChart from '../components/EngagementChart';
 import EmptyState from '../../../components/EmptyState';
 import { LuChartColumn } from 'react-icons/lu';
+import ChartSkeleton from '../../../components/Loaders/dashboard/ChartSkeleton';
 
-const EngagementSection = ({ stats }) => {
+const EngagementSection = ({ stats, loading }) => {
     const charData = [
         {
             name: "Views",
@@ -23,17 +24,21 @@ const EngagementSection = ({ stats }) => {
         },
     ];
 
+    if (loading) {
+        return <ChartSkeleton />
+    }
+
     if (!charData?.length) {
-    return (
-        <div className="min-h-80 flex items-center justify-center">
-            <EmptyState
-                icon={<LuChartColumn />}
-                title="No hay datos de participacion"
-                description="Aquí aparecerán los análisis de interacción posteriores."
-            />
-        </div>
-    );
-}
+        return (
+            <div className="min-h-80 flex items-center justify-center">
+                <EmptyState
+                    icon={<LuChartColumn />}
+                    title="No hay datos de participacion"
+                    description="Aquí aparecerán los análisis de interacción posteriores."
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="grid grid-cols-5 mt-4">

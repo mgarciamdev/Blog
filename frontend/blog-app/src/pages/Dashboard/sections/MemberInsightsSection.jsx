@@ -3,7 +3,7 @@ import RecentActivitySection from './RecentActivitySection';
 import SavedPostSection from './SavedPostSection';
 import MyFeedbackStatusSection from './MyFeedbackStatusSection';
 
-const MemberInsightsSection = ({ saved, feedbacks, stats }) => {
+const MemberInsightsSection = ({ saved, feedbacks, stats, loading }) => {
     const hasActivity =
         saved?.length > 0 || feedbacks?.length > 0;
 
@@ -17,10 +17,10 @@ const MemberInsightsSection = ({ saved, feedbacks, stats }) => {
                     </h3>
                 </div>
 
-                <SavedPostSection saved={saved} />
+                <SavedPostSection saved={saved} loading={loading}/>
             </div>
 
-            {hasActivity && (
+            {(loading || hasActivity) && (
                 <div className="col-span-12 md:col-span-3 bg-white p-6 rounded-2xl shadow-md shadow-gray-100 border border-gray-200/50 transition-all duration-200 hover:bg-emerald-50/40 hover:-translate-y-1 hover:shadow-lg hover:border-emerald-200">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-semibold text-gray-900">
@@ -28,7 +28,7 @@ const MemberInsightsSection = ({ saved, feedbacks, stats }) => {
                         </h3>
                     </div>
 
-                    <RecentActivitySection saved={saved} feedbacks={feedbacks} />
+                    <RecentActivitySection saved={saved} feedbacks={feedbacks} loading={loading}/>
                 </div>
             )}
 
@@ -39,7 +39,7 @@ const MemberInsightsSection = ({ saved, feedbacks, stats }) => {
                     </h3>
                 </div>
 
-                <MyFeedbackStatusSection stats={stats} feedbacks={feedbacks} />
+                <MyFeedbackStatusSection stats={stats} feedbacks={feedbacks} loading={loading}/>
             </div>
         </div>
     );

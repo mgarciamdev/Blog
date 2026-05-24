@@ -2,8 +2,9 @@ import React from 'react'
 import RoleProgressCard from '../components/RoleProgressCard';
 import EmptyState from '../../../components/EmptyState';
 import { LuUser } from 'react-icons/lu';
+import ChartSkeleton from '../../../components/Loaders/dashboard/ChartSkeleton';
 
-const RoleDistributionSection = ({ stats }) => {
+const RoleDistributionSection = ({ stats, loading }) => {
 
     const roleData = [
         {
@@ -22,6 +23,10 @@ const RoleDistributionSection = ({ stats }) => {
             color: "#0ea5e9",
         },
     ];
+
+    if (loading) {
+        return <ChartSkeleton />;
+    }
 
     if (!roleData?.length) {
     return (

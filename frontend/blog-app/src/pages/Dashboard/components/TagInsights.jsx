@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import PieChartCard from '../../../components/Charts/PieChartCard';
 import { LuChartPie } from 'react-icons/lu';
 import EmptyState from '../../../components/EmptyState';
+import DonutChartSkeleton from '../../../components/Loaders/dashboard/DonutChartSkeleton';
 
 const COLORS = [
     "#10b981",
@@ -32,7 +33,7 @@ const TagCloud = ({ tags }) => {
     );
 }
 
-const TagInsights = ({ tagUsage = [] }) => {
+const TagInsights = ({ tagUsage = [], loading }) => {
     const processedData = useMemo(() => {
         if (!tagUsage?.length) return [];
 
@@ -58,6 +59,10 @@ const TagInsights = ({ tagUsage = [] }) => {
         return finalData;
 
     }, [tagUsage]);
+
+    if (loading) {
+        return <DonutChartSkeleton />;
+    }
 
     if (!tagUsage?.length) {
         return (

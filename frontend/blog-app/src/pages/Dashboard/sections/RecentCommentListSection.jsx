@@ -4,8 +4,13 @@ import { LuDot, LuMessageSquareDashed } from 'react-icons/lu'
 import moment from 'moment'
 import { roleAvatarStyles, roleStyles } from '../../../utils/helper'
 import EmptyState from '../../../components/EmptyState'
+import ListSkeleton from '../../../components/Loaders/dashboard/ListSkeleton'
 
-const RecentCommentListSection = ({ comments }) => {
+const RecentCommentListSection = ({ comments, loading }) => {
+    if (loading) {
+        return <ListSkeleton items={3} showImage/>;
+    }
+
     return (
         <div className="mt-4">
             <div className="space-y-4">
