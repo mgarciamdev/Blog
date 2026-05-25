@@ -13,7 +13,10 @@ const COLORS = [
 ];
 
 const TagCloud = ({ tags }) => {
-    const maxCount = Math.max(...tags.map((tag) => tag.count), 1);
+    const maxCount = Math.max(
+        ...(tags?.map((tag) => tag.count) || [1]), 
+        1
+    );
 
     return (
         <div className="flex flex-wrap gap-2">
@@ -77,7 +80,7 @@ const TagInsights = ({ tagUsage = [], loading }) => {
     }
 
     return (
-        <div className="grid grid-cols-12 mt-4">
+        <div className="animate-fadeIn grid grid-cols-12 mt-4">
             <div className="col-span-12 md:col-span-7">
                 <PieChartCard data={processedData} colors={COLORS} />
             </div>

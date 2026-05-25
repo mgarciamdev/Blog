@@ -1,9 +1,14 @@
 import React from 'react'
 import BlogLayout from '../../components/Layouts/BlogLayout/BlogLayout'
+import PageTransition from '../../components/Transitions/PageTransition'
 
 const BlogLandingPage = () => {
   return (
-    <BlogLayout>BlogLandingPage</BlogLayout>
+    <PageTransition>
+      <BlogLayout>
+        BlogLandingPage
+      </BlogLayout>
+    </PageTransition>
   )
 }
 

@@ -5,7 +5,7 @@ const TopPostCard = ({ title, coverImageUrl, views, likes, maxViews }) => {
     const viewPercentage = ((views / maxViews) * 100).toFixed(0);
 
     return (
-        <div className="bg-white py-4 flex flex-col gap-3 border-b border-gray-100">
+        <div className="animate-fadeIn bg-white py-4 flex flex-col gap-3 border-b border-gray-100 transition-all duration-300 hover:-translate-y-1">
             <div className="flex items-start gap-2">
                 <img
                     src={coverImageUrl}
