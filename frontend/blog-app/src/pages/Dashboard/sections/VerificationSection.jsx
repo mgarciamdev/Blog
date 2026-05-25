@@ -12,7 +12,9 @@ const VerificationSection = ({ stats, loading }) => {
 
     const totalUsers = stats?.totalUsers || 0;
 
-    const charData = [
+    const hasVerificationData = totalUsers > 0;
+
+    const chartData = [
         {
             name: "Verified",
             value: stats?.verifiedUsers || 0,
@@ -23,7 +25,7 @@ const VerificationSection = ({ stats, loading }) => {
         },
     ];
 
-    if (totalUsers === 0) {
+    if (hasVerificationData === 0) {
         return (
             <div className="min-h-80 flex items-center justify-center">
                 <EmptyState
@@ -36,9 +38,9 @@ const VerificationSection = ({ stats, loading }) => {
     }
 
     return (
-        <div className="grid grid-cols-5 mt-4">
+        <div className="animate-fadeIn mt-4">
             <div className="col-span-12 md:col-span-7">
-                <VerificationChart data={charData} totalUsers={totalUsers} />
+                <VerificationChart data={chartData} totalUsers={totalUsers} />
             </div>
         </div>
     );

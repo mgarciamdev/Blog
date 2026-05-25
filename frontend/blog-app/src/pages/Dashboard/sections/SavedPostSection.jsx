@@ -6,19 +6,19 @@ import ListSkeleton from '../../../components/Loaders/dashboard/ListSkeleton';
 
 const SavedPostSection = ({ saved, loading }) => {
 
-    const recentSaved = saved.slice(0, 4);
+    const recentSaved = saved?.slice(0, 4) || [];
 
     if (loading) {
-        return <ListSkeleton items={4} showImage/>;
+        return <ListSkeleton items={3} showImage/>;
     }
 
     return (
-        <div className="space-y-4">
+        <div className="animate-fadeIn space-y-4">
             {!recentSaved?.length ? (
                 <EmptyState
                     icon={<LuBookmark />}
-                    title="No existen post guardados todavia"
-                    description="Los ultimos posts que guardes apareceran aqui."
+                    title="No existen posts guardados todavía"
+                    description="Los últimos posts que guardes apareceran aqui."
                 />
             ) : (
                 recentSaved.map((item) => (

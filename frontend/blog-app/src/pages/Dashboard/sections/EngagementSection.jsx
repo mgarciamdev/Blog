@@ -5,7 +5,7 @@ import { LuChartColumn } from 'react-icons/lu';
 import ChartSkeleton from '../../../components/Loaders/dashboard/ChartSkeleton';
 
 const EngagementSection = ({ stats, loading }) => {
-    const charData = [
+    const chartData = [
         {
             name: "Views",
             value: stats?.totalViews || 0,
@@ -24,16 +24,20 @@ const EngagementSection = ({ stats, loading }) => {
         },
     ];
 
+    const hasEngagementData = chartData.some(
+        (item) => item.value > 0
+    );
+
     if (loading) {
         return <ChartSkeleton />
     }
 
-    if (!charData?.length) {
+    if (!hasEngagementData?.length) {
         return (
             <div className="min-h-80 flex items-center justify-center">
                 <EmptyState
                     icon={<LuChartColumn />}
-                    title="No hay datos de participacion"
+                    title="No hay datos de participación"
                     description="Aquí aparecerán los análisis de interacción posteriores."
                 />
             </div>
@@ -41,9 +45,9 @@ const EngagementSection = ({ stats, loading }) => {
     }
 
     return (
-        <div className="grid grid-cols-5 mt-4">
+        <div className="animate-fadeIn grid grid-cols-5 mt-4">
             <div className="col-span-12 md:col-span-7">
-                <EngagementChart data={charData} />
+                <EngagementChart data={chartData} />
             </div>
         </div>
     );

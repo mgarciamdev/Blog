@@ -7,15 +7,17 @@ import FeedbackStatusSkeleton from '../../../components/Loaders/dashboard/Feedba
 
 const MyFeedbackStatusSection = ({ stats, feedbacks, loading }) => {
 
-    const pendingCount = feedbacks.filter(
+    const safeFeedbacks = feedbacks || [];
+
+    const pendingCount = safeFeedbacks.filter(
         (item) => item.status === "pending"
     ).length;
 
-    const respondedCount = feedbacks.filter(
+    const respondedCount = safeFeedbacks.filter(
         (item) => item.status === "responded"
     ).length;
 
-    const latestResponded = feedbacks
+    const latestResponded = [...safeFeedbacks]
         .filter((item) => item.response?.respondedAt)
         .sort(
             (a, b) =>
@@ -33,49 +35,51 @@ const MyFeedbackStatusSection = ({ stats, feedbacks, loading }) => {
         return (
             <EmptyState
                 icon={<LuMessageSquareMore />}
-                title="No existen feedbacks todavia"
-                description="Los feedbacks apareceran aqui."
+                title="No existen feedbacks todavía"
+                description="Los feedbacks aparecerán aqui."
             />
         );
     }
 
     return (
         <>
-            <div className="grid grid-cols-3 gap-4">
-                <FeedbackStatusCard
-                    title="Feedbacks"
-                    value={stats?.myFeedbacks || 0}
-                    icon={<LuMessageSquareMore />}
-                    bgColor="bg-sky-100"
-                    iconColor="text-sky-700"
-                />
+            <div className="animate-fadeIn">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FeedbackStatusCard
+                        title="Feedbacks"
+                        value={stats?.myFeedbacks || 0}
+                        icon={<LuMessageSquareMore />}
+                        bgColor="bg-sky-100"
+                        iconColor="text-sky-700"
+                    />
 
-                <FeedbackStatusCard
-                    title="Responded"
-                    value={respondedCount || 0}
-                    icon={<LuBadgeCheck />}
-                    bgColor="bg-emerald-100"
-                    iconColor="text-emerald-700"
-                />
+                    <FeedbackStatusCard
+                        title="Responded"
+                        value={respondedCount || 0}
+                        icon={<LuBadgeCheck />}
+                        bgColor="bg-emerald-100"
+                        iconColor="text-emerald-700"
+                    />
 
-                <FeedbackStatusCard
-                    title="Pending"
-                    value={pendingCount || 0}
-                    icon={<LuMessageCircleWarning />}
-                    bgColor="bg-yellow-100"
-                    iconColor="text-yellow-700"
-                />
-            </div>
-            <div>
-                {lastResponseTime && (
-                    <div className="mt-6 flex items-center gap-2 text-sm text-gray-500">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <FeedbackStatusCard
+                        title="Pending"
+                        value={pendingCount || 0}
+                        icon={<LuMessageCircleWarning />}
+                        bgColor="bg-yellow-100"
+                        iconColor="text-yellow-700"
+                    />
+                </div>
+                <div>
+                    {lastResponseTime && (
+                        <div className="mt-6 flex items-center gap-2 text-sm text-gray-500">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
 
-                        <span className="text-sm text-gray-500">
-                            Last response {moment(lastResponseTime).fromNow()}
-                        </span>
-                    </div>
-                )}
+                            <span className="text-sm text-gray-500">
+                                Last response received {moment(lastResponseTime).fromNow()}
+                            </span>
+                        </div>
+                    )}
+                </div>
             </div>
         </>
     )

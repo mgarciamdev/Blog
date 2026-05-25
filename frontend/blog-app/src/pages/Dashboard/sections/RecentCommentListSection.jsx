@@ -12,7 +12,7 @@ const RecentCommentListSection = ({ comments, loading }) => {
     }
 
     return (
-        <div className="mt-4">
+        <div className="animate-fadeIn mt-4">
             <div className="space-y-4">
                 {!comments?.length ? (
                     <EmptyState
@@ -75,7 +75,7 @@ const RecentCommentListSection = ({ comments, loading }) => {
                                         </p>
                                     </div>
                                 </div>
-                                <div className="mt-2 flex items-center gap-3 bg-gray-50 rounded-lg">
+                                <div className="mt-2 flex items-center gap-3 bg-gray-50 rounded-lg p-2">
                                     <img
                                         src={comment.post?.coverImageUrl}
                                         alt={comment.post?.title}

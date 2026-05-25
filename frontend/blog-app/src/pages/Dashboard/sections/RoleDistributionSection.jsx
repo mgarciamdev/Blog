@@ -24,36 +24,39 @@ const RoleDistributionSection = ({ stats, loading }) => {
         },
     ];
 
+    const hasRoleData = roleData.some(
+        (item) => item.value > 0
+    );
+
     if (loading) {
         return <ChartSkeleton />;
     }
 
-    if (!roleData?.length) {
+    if (!hasRoleData?.length) {
     return (
         <div className="min-h-80 flex items-center justify-center">
             <EmptyState
                 icon={<LuUser />}
                 title="No hay datos de roles de usuarios"
-                description="Aquí aparecerán las estadisticas de roles de usuario."
+                description="Aquí aparecerán las estadísticas de roles de usuario."
             />
         </div>
     );
 }
     
     return (
-        <div className="grid grid-cols-5 mt-4">
-            <div className="col-span-12 md:col-span-7">
+        <div className="animate-fadeIn mt-4">
+
                 {roleData.map((item) => (
                     <RoleProgressCard
                         key={item.role}
                         role={item.role}
                         value={item.value}
-                        total={stats?.totalUsers}
+                        total={stats?.totalUsers || 0}
                         color={item.color}
                     />
                 ))}
-                
-            </div>
+
         </div>
     );
 };

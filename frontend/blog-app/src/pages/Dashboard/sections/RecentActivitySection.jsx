@@ -5,7 +5,7 @@ import EmptyState from '../../../components/EmptyState';
 import ListSkeleton from '../../../components/Loaders/dashboard/ListSkeleton';
 
 const RecentActivitySection = ({ saved, feedbacks, loading }) => {
-    const savedActivities = saved.map((item) => ({
+    const savedActivities = (saved || []).map((item) => ({
         id: item._id,
         type: "save",
         title: item.post?.title,
@@ -14,7 +14,7 @@ const RecentActivitySection = ({ saved, feedbacks, loading }) => {
         date: item.savedAt,
     }));
 
-    const feedbackActivities = feedbacks.map((item) => ({
+    const feedbackActivities = (feedbacks || []).map((item) => ({
         id: item._id,
         type: "feedback",
         title: item.title,
@@ -29,23 +29,23 @@ const RecentActivitySection = ({ saved, feedbacks, loading }) => {
         ...feedbackActivities,
     ];
 
-    activities.sort(
+    const sortedActivities = [...activities].sort(
         (a, b) => new Date(b.date) - new Date(a.date)
     );
 
-    const limitedActivities = activities.slice(0, 3);
+    const limitedActivities = sortedActivities.slice(0, 3);
 
     if (loading) {
         return <ListSkeleton items={3} showImage/>;
     }
 
     return (
-        <div className="space-y-4">
+        <div className="animate-fadeIn space-y-4">
             {!limitedActivities?.length ? (
                 <EmptyState
                     icon={<LuActivity />}
                     title="No hay actividad reciente"
-                    description="Tus ultimas acciones apareceran aqui."
+                    description="Tus últimas acciones aparecerán aqui."
                 />
             ) : (
                 limitedActivities.map((activity) => (
@@ -91,7 +91,7 @@ const RecentActivitySection = ({ saved, feedbacks, loading }) => {
                             {activity.type === "feedback" && activity.status !== "responded" && (
                                 <>
                                     <p className="text-sm font-semibold text-gray-900">
-                                        sent feedback
+                                        Sent feedback
                                     </p>
 
                                     <p className="text-sm text-gray-600 mt-1">
