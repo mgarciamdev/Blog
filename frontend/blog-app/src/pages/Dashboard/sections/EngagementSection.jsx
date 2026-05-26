@@ -32,12 +32,12 @@ const EngagementSection = ({ stats, loading }) => {
         return <ChartSkeleton />
     }
 
-    if (!hasEngagementData?.length) {
+    if (!hasEngagementData) {
         return (
             <div className="min-h-80 flex items-center justify-center">
                 <EmptyState
                     icon={<LuChartColumn />}
-                    title="No hay datos de participación"
+                    title="No hay datos de participacion"
                     description="Aquí aparecerán los análisis de interacción posteriores."
                 />
             </div>
@@ -45,7 +45,7 @@ const EngagementSection = ({ stats, loading }) => {
     }
 
     return (
-        <div className="animate-fadeIn grid grid-cols-5 mt-4">
+        <div className="animate-fadeIn mt-4">
             <div className="col-span-12 md:col-span-7">
                 <EngagementChart data={chartData} />
             </div>
