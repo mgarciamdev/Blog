@@ -24,56 +24,43 @@ export const ADMIN_SIDE_MENU = [
         id: "01",
         label: "Dashboard",
         icon: LuLayoutDashboard,
-        path: "/admin/dashboard"
+        path: "/dashboard"
     },
     {
         id: "02",
         label: "Blog Posts",
         icon: LuGalleryVerticalEnd,
-        path: "/admin/posts"
+        path: "/posts"
     },
     {
         id: "03",
         label: "Comments",
         icon: LuMessageSquareQuote,
-        path: "/admin/comments"
+        path: "/comments"
     },
     {
         id: "04",
         label: "User List",
         icon: LuUser,
-        path: "/admin/users"
+        path: "/users"
     },
     {
-        id: "06",
-        label: "User Profile",
-        icon: FaUserGear,
-        path: "/admin/profile"
-    },
-    {
-        id: "06",
+        id: "05",
         label: "Blog",
         icon: FaHome,
         path: "/"
     },
     {
-        id: "07",
+        id: "06",
         label: "Settings",
         icon: FaGears,
-        path: "/admin/settings"
+        path: "/settings"
     },
     {
-        id: "08",
+        id: "07",
         label: "FeedBack",
         icon: FaMailBulk,
-        children: [
-            {
-                id: "08-1",
-                label: "Received FeedBack",
-                icon: LuMail,
-                path: "/admin/feedback"
-            },
-        ],
+        path: "/feedback"
     },
 ];
 
@@ -82,72 +69,31 @@ export const MEMBER_SIDE_MENU = [
         id: "01",
         label: "Dashboard",
         icon: LuLayoutDashboard,
-        path: "/blog/dashboard"
+        path: "/dashboard"
     },
     {
         id: "02",
-        label: "User Profile",
-        icon: FaUserGear,
-        path: "/blog/dashboard"
-    },
-    {
-        id: "03",
         label: "Blog",
         icon: FaHome,
         path: "/"
     },
     {
-        id: "04",
+        id: "03",
         label: "Settings",
         icon: FaGears,
-        path: "/blog/settings"
+        path: "/settings"
+    },
+    {
+        id: "04",
+        label: "FeedBack",
+        icon: FaMailBulk,
+        path: "/feedback"
     },
     {
         id: "05",
-        label: "FeedBack",
-        icon: FaMailBulk,
-        children: [
-            {
-                id: "05-1",
-                label: "Send FeedBack",
-                icon: LuMail,
-                path: "/blog/feedback"
-            },
-            {
-                id: "05-2",
-                label: "Feedback responses",
-                icon: LuMailCheck,
-                path: "/blog/feedback-response"
-            },
-        ],
-    },
-    {
-        id: "06",
         label: "Saved Data",
         icon: FaRegSave,
-        children: [
-            {
-                id: "06-1",
-                label: "Saved Posts",
-                icon: LuBookmark,
-                path: "/blog/posts"
-            },
-            {
-                id: "06-2",
-                label: "My Likes",
-                icon: LuHeart,
-                path: "/blog/likes"
-            },
-        ],
-    },
-];
-
-export const BLOG_USER_EXTRA_MENU = [ //Test
-    {
-        id: "01",
-        label: "Dashboard",
-        icon: LuLayoutDashboard,
-        path: "/blog/dashboard"
+        path: "/saved"
     },
 ];
 
@@ -222,5 +168,44 @@ export const SETTINGS_SIDE_MENU = [
         id: "05",
         label: "Delete Account",
         icon: LuTrash2,
+    },
+];
+
+export const SUPERADMIN_SIDE_MENU = [
+    {
+        id: "01",
+        label: "Dashboard",
+        icon: LuLayoutDashboard,
+        path: "/dashboard"
+    },
+        {
+        id: "02",
+        label: "Blog Posts",
+        icon: LuGalleryVerticalEnd,
+        path: "/posts"
+    },
+    {
+        id: "03",
+        label: "Comments",
+        icon: LuMessageSquareQuote,
+        path: "/comments"
+    },
+    {
+        id: "04",
+        label: "User List",
+        icon: LuUser,
+        path: "/users"
+    },
+    {
+        id: "05",
+        label: "Blog",
+        icon: FaHome,
+        path: "/"
+    },
+    {
+        id: "06",
+        label: "Settings",
+        icon: FaGears,
+        path: "/settings"
     },
 ];

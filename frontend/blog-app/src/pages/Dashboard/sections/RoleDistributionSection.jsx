@@ -32,7 +32,7 @@ const RoleDistributionSection = ({ stats, loading }) => {
         return <ChartSkeleton />;
     }
 
-    if (!hasRoleData?.length) {
+    if (!hasRoleData) {
     return (
         <div className="min-h-80 flex items-center justify-center">
             <EmptyState

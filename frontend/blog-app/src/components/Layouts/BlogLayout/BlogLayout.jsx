@@ -1,10 +1,10 @@
 import React from 'react'
 import BlogNavbar from './BlogNavbar'
 
-const BlogLayout = ({ children, activeMenu }) => {
+const BlogLayout = ({ children }) => {
     return (
         <div className='bg-white pb-32'>
-            <BlogNavbar activeMenu={activeMenu} />
+            <BlogNavbar />
 
             <div className="container mx-auto px-5 md:px-0 mt-10">{children}</div>
         </div>

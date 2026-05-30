@@ -11,7 +11,7 @@ import SideMenu from '../SideMenu';
 import { UserContext } from '../../../context/userContext';
 import { isAdminRole } from '../../../utils/helper';
 
-const BlogNavbar = ({ activeMenu }) => {
+const BlogNavbar = () => {
     const [openSideMenu, setOpenSideMenu] = useState(false);
     const [openSearchBar, setOpenSearchBar] = useState(false);
     const [openProfileMenu, setOpenProfileMenu] = useState(false) /* nuevo Const */
@@ -146,9 +146,8 @@ const BlogNavbar = ({ activeMenu }) => {
 
                     {/* Mobile side menu */}
                     {openSideMenu && (
-                        <div className="fixed top-[61px] left-0 bg-white z-50">
+                        <div className="fixed top-15.25 left-0 bg-white z-50">
                             <SideMenu
-                                activeMenu={activeMenu}
                                 isBlogMenu
                             />
                         </div>
