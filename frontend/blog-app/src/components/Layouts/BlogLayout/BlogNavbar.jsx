@@ -1,28 +1,55 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
 import { Link, useNavigate } from 'react-router-dom';
-import { LuSearch } from 'react-icons/lu';
+import { LuSearch, LuLogOut, LuLayoutDashboard } from 'react-icons/lu';
 import { BLOG_NAVBAR_DATA } from '../../../utils/data';
 
-
 import Logo from '../../../assets/react.svg'
-import { FaCircleChevronDown, FaCircleChevronUp } from 'react-icons/fa6';
 import SideMenu from '../SideMenu';
 import { UserContext } from '../../../context/userContext';
-import { isAdminRole } from '../../../utils/helper';
+import axiosInstance from '../../../utils/axiosInstance';
+import { API_PATHS } from '../../../utils/apiPaths';
+import CharAvatar from '../../Cards/CharAvatar';
+import SearchBarPopup from '../../../pages/Blog/components/SearchBarPopup';
 
 const BlogNavbar = () => {
     const [openSideMenu, setOpenSideMenu] = useState(false);
     const [openSearchBar, setOpenSearchBar] = useState(false);
-    const [openProfileMenu, setOpenProfileMenu] = useState(false) /* nuevo Const */
+    const [openProfileMenu, setOpenProfileMenu] = useState(false);
 
     const { user, clearUser } = useContext(UserContext);
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        clearUser();
-        setOpenProfileMenu(false)
+    const handleLogout = async () => {
+        try {
+            await axiosInstance.post(API_PATHS.AUTH.LOGOUT);
+        } catch (error) {
+            console.error("Error al cerrar sesión:", error);
+        } finally {
+            clearUser();
+            localStorage.clear();
+
+            navigate("/", {
+                replace: true,
+            });
+        }
     };
+
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setOpenProfileMenu(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     return (
         <>
@@ -39,11 +66,7 @@ const BlogNavbar = () => {
                                 setOpenSideMenu((prev) => !prev)
                             }
                         >
-                            {openSideMenu ? (
-                                <HiOutlineX className="text-2xl" />
-                            ) : (
-                                <HiOutlineMenu className="text-2xl" />
-                            )}
+                            <HiOutlineMenu className="text-2xl" />
                         </button>
 
                         {/* Logo */}
@@ -51,7 +74,7 @@ const BlogNavbar = () => {
                             <img
                                 src={Logo}
                                 alt="logo"
-                                className="h-6 md:h-[26px]"
+                                className="h-6 md:h-6.5"
                             />
                         </Link>
                     </div>
@@ -102,58 +125,91 @@ const BlogNavbar = () => {
                                 Login
                             </button>
                         ) : (
-                            <div className="hidden md:flex items-center gap-2 cursor-pointer relative">
-                                {/* <ProfileInfoCard /> */}
-                                <span
-                                    onClick={() =>
-                                        setOpenProfileMenu((prev) => !prev)
-                                    }
+                            <div
+                                ref={dropdownRef}
+                                className="relative flex items-center"
+                            >
+                                <button
+                                    onClick={() => setOpenProfileMenu((prev) => !prev)}
                                 >
-                                    {openProfileMenu ? (
-                                        <FaCircleChevronUp size={18} />
+                                    {user?.profileImageUrl ? (
+                                        <img
+                                            src={user.profileImageUrl}
+                                            alt="Profile"
+                                            className="w-10 h-10 rounded-full object-cover"
+                                        />
                                     ) : (
-                                        <FaCircleChevronDown size={18} />
+                                        <CharAvatar
+                                            fullName={user?.name || ""}
+                                            width="w-10"
+                                            height="h-10"
+                                            style="text-sm"
+                                        />
                                     )}
-                                </span>
+                                </button>
 
-                                {/* Dropdown */}
-                                {openProfileMenu && (
-                                    <div className="absolute top-14 right-0 bg-white shadow-lg border border-gray-100 rounded-md py-1 w-44 z-50">
-                                        <Link
-                                            to={
-                                                isAdminRole(user?.role)
-                                                    ? "/admin/dashboard"
-                                                    : "/dashboard"
-                                            }
-                                        >
-                                            <button
-                                                className="w-full text-left px-10 py-2 hover:bg-gray-100 hover:text-emerald-400 rounded"
-                                            >
-                                                Dashboard
-                                            </button>
-                                        </Link>
+                                <div
+                                    className={`absolute top-12 right-1 w-50 bg-white border border-gray-200 rounded-2xl shadow-lg p-3 z-50 transition-all duration-200 origin-top-right ${openProfileMenu ? "opacity-100 scale-100 translate-y-0 visible" : "opacity-0 -translate-y-2 scale-95 invisible"}`}
+                                >
+
+                                    {/* Usuario */}
+                                    <div className="pb-3 border-b border-gray-100">
+                                        <h4 className="font-semibold text-gray-900">
+                                            {user?.name}
+                                        </h4>
+
+                                        <p className="text-sm text-gray-500">
+                                            {user?.email}
+                                        </p>
+                                    </div>
+
+                                    {/* Opciones */}
+                                    <div className="mt-3 space-y-1">
                                         <button
-                                            onClick={handleLogout}
-                                            className="w-full text-left px-10 py-2 hover:bg-gray-100 hover:text-red-400 rounded"
+                                            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-100"
+                                            onClick={() => {
+                                                navigate("/dashboard");
+                                                setOpenProfileMenu(false);
+                                            }}
                                         >
+                                            <LuLayoutDashboard className="text-xl" />
+                                            Dashboard
+                                        </button>
+
+                                        <button
+                                            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-50"
+                                            onClick={handleLogout}
+                                        >
+                                            <LuLogOut className="text-xl" />
                                             Logout
                                         </button>
                                     </div>
-                                )}
+                                </div>
+
                             </div>
                         )}
                     </div>
-
-                    {/* Mobile side menu */}
-                    {openSideMenu && (
-                        <div className="fixed top-15.25 left-0 bg-white z-50">
-                            <SideMenu
-                                isBlogMenu
-                            />
-                        </div>
-                    )}
                 </div>
             </div>
+
+            {/* Mobile side menu */}
+            {openSideMenu && (
+                <div
+                    className="fixed inset-0 bg-black/40 z-40"
+                    onClick={() => setOpenSideMenu(false)}
+                />
+            )}
+
+            <div
+                className={`fixed top-0 left-0 h-screen z-50 transform transition-transform duration-300 ${openSideMenu ? "translate-x-0" : "-translate-x-full"}`}
+            >
+                <SideMenu
+                    isBlogMenu
+                    closeMenu={() => setOpenSideMenu(false)}
+                />
+            </div>
+            
+            <SearchBarPopup isOpen={openSearchBar} setIsOpen={setOpenSearchBar} />
         </>
     );
 };

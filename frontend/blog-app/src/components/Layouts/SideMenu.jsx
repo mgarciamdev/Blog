@@ -75,7 +75,7 @@ const SideMenu = ({ closeMenu, isBlogMenu }) => {
 
     return (
         <div className="w-64 h-screen bg-white border-r border-gray-100 p-5 overflow-y-auto">
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mt-5 mb-8">
                 <img
                     src={LOGO}
                     alt="prueba"

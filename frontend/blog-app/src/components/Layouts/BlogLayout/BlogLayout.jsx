@@ -3,12 +3,14 @@ import BlogNavbar from './BlogNavbar'
 
 const BlogLayout = ({ children }) => {
     return (
-        <div className='bg-white pb-32'>
+        <div className="min-h-screen bg-white">
             <BlogNavbar />
 
-            <div className="container mx-auto px-5 md:px-0 mt-10">{children}</div>
+            <main className="container mx-auto px-5 pt-24">
+                {children}
+            </main>
         </div>
-    )
-}
+    );
+};
 
-export default BlogLayout
+export default BlogLayout;
