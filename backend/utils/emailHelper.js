@@ -33,7 +33,7 @@ const sendPasswordChangeEmail = async (user, req) => {
 
 // recoverPassword email (auth)
 const sendRecoverPasswordEmail = async (user, token) => {
-    const recoverLink = `${process.env.BACKEND_URL}/api/auth/recover/${token}`;
+    const recoverLink = `${process.env.BACKEND_URL}/api/auth/password/recover/${token}`;
 
     await sendEmail(
         user.email,

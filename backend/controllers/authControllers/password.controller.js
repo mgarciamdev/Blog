@@ -58,7 +58,7 @@ const recoverPassword = async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(200).json({ message: "Si el email existe, recibirás instrucciones" });
+            return res.status(404).json({ message: "Si el email existe, recibirás instrucciones" });
         }
 
         // Generamos nuevo Token
@@ -86,7 +86,7 @@ const recoverPassword = async (req, res) => {
 }
 
 // @desc    Validamos el link enviado desde el backend y redireccionamos al frontend
-// @route   GET /api/auth/recover/:token
+// @route   GET /api/auth/password/recover/:token
 // @access  Public
 const verifyChangeToken = async (req, res) => {
     const { token } = req.params;
@@ -99,16 +99,16 @@ const verifyChangeToken = async (req, res) => {
     try {
         const user = await User.findOne({
             resetPasswordToken: hashedToken,
-            rsPassTokenExpires: { $gt: Date.now() }, // Verificamos que no este expirado
+            resetPasswordExpires: { $gt: Date.now() }, // Verificamos que no este expirado
         });
 
         if (!user) {
-            return res.redirect(`${process.env.FRONTEND_URL}/changePass?status=invalid`);
+            return res.redirect(`${process.env.FRONTEND_URL}/reset-password?status=invalid`);
         }
 
-        return res.redirect(`${process.env.FRONTEND_URL}/changePass?token=${token}`);
+        return res.redirect(`${process.env.FRONTEND_URL}/reset-password?token=${token}`);
     } catch (error) {
-        return res.redirect(`${process.env.FRONTEND_URL}/changePass?status=error`);
+        return res.redirect(`${process.env.FRONTEND_URL}/reset-password?status=error`);
     }
 };
 
