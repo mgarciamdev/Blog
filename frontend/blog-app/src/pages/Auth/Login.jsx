@@ -6,8 +6,8 @@ import { validateEmail } from "../../utils/helper";
 import publicAxios from "../../utils/publicAxios";
 import { API_PATHS } from "../../utils/apiPaths";
 import Logo from '../../assets/react.svg';
-import AuthInput from "../Inputs/AuthInput";
-import PageTransition from "../Transitions/PageTransition";
+import AuthInput from "../../components/Inputs/AuthInput";
+import PageTransition from "../../components/Transitions/PageTransition";
 
 
 const Login = () => {

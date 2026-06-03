@@ -9,8 +9,11 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import BlogPostEditor from "./pages/Admin/BlogPostEditor";
 import BlogPosts from "./pages/Admin/BlogPosts";
 import Comments from "./pages/Admin/Comments";
-import Login from "./components/Auth/Login";
-import SignUp from "./components/Auth/SignUp";
+import Login from "./pages/Auth/Login";
+import SignUp from "./pages/Auth/SignUp";
+import ForgetPassword from "./pages/Auth/ForgetPassword";
+import ResetPassword from "./pages/Auth/ResetPassword";
+import Verify from "./pages/Auth/Verify";
 
 const App = () => {
   return (
@@ -24,6 +27,9 @@ const App = () => {
           <Route path="/search" element={<SearchPosts />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/forget-password" element={<ForgetPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify" element={<Verify />} />
 
           {/* Rutas Privadas del Administrador */}
           <Route element={<PrivateRoute allowedRoles={["admin", "superadmin"]} />}>

@@ -8,13 +8,13 @@ import uploadImage from "../../utils/uploadImage";
 import Logo from '../../assets/react.svg';
 
 import { LuArrowLeft } from 'react-icons/lu';
-import AuthInput from "../Inputs/AuthInput";
-import PassowordField from "../Inputs/PassowordField";
-import ProfilePhotoSelector from "../Inputs/ProfilePhotoSelector";
-import UsernameField from "../Inputs/UsernameField";
+import AuthInput from "../../components/Inputs/AuthInput";
+import PassowordField from "../../components/Inputs/PassowordField";
+import ProfilePhotoSelector from "../../components/Inputs/ProfilePhotoSelector";
+import UsernameField from "../../components/Inputs/UsernameField";
 // eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from "framer-motion";
-import PageTransition from "../Transitions/PageTransition";
+import PageTransition from "../../components/Transitions/PageTransition";
 
 const SignUp = () => {
   const [step, setStep] = useState(1);
@@ -94,8 +94,8 @@ const SignUp = () => {
         throw new Error("Por favor ingrese un correo electronico valido");
       }
 
-      if (password.length >= 8) {
-        throw new Error("La contraseña debe tener mínimo 8 caracteres");
+      if (password.length > 12) {
+        throw new Error("La contraseña debe tener mínimo 12 caracteres");
       }
 
       if (profilePic) {

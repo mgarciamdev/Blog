@@ -18,6 +18,7 @@ const PassowordField = ({ password, setPassword }) => {
     return (
         <div>
             <AuthInput
+                autoFocus
                 value={password}
                 onChange={({ target }) => {
                     setPassword(target.value);
