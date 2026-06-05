@@ -85,7 +85,7 @@ const ResetPassword = () => {
         <div
             className="flex items-center justify-center min-h-screen p-4 bg-linear-to-tr from-slate-100 to-gray-200"
         >
-            <div className="absolute top-6 left-6">
+            <div className="absolute top-6 left-6 md:top-6 md:left-6">
                 <img
                     src={Logo}
                     alt="Logo"
@@ -98,7 +98,7 @@ const ResetPassword = () => {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="bg-white/50 backdrop-blur-xl border border-white/60 shadow-2xl rounded-3xl p-8 w-full max-w-md text-center"
+                className="bg-white/50 backdrop-blur-xl border border-white/60 shadow-2xl rounded-3xl p-6 sm:p-8 w-full max-w-sm text-center"
             >
                 <div className="flex justify-start mb-4">
                     <span
@@ -111,9 +111,9 @@ const ResetPassword = () => {
 
                 {isInvalid ? (
                     <>
-                        <FiXCircle size={70} className="text-red-500 mx-auto mb-6" />
+                        <FiXCircle className="text-red-500 text-5xl md:text-6xl mx-auto mb-6" />
                         <h2 className="text-2xl font-semibold mb-2">Token invalido o expirado</h2>
-                        <p className="text-gray-600 mb-6">
+                        <p className="text-gray-600 mb-6 max-w-xs mx-auto">
                             Solicita nuevamente el enlace de recuperación para continuar.
                         </p>
                         <button
@@ -125,9 +125,9 @@ const ResetPassword = () => {
                     </>
                 ) : (
                     <>
-                        <MdPassword size={70} className="text-slate-700 mx-auto mb-6" />
-                        <h2 className="text-3xl font-semibold mb-2">Nueva contraseña</h2>
-                        <p className="text-gray-600 mb-6">Ingresa y confirma tu nueva contraseña</p>
+                        <MdPassword className="text-slate-700 text-6xl md:text-6xl mx-auto mb-6" />
+                        <h2 className="text-2xl sm:text-3xl font-semibold mb-2">Nueva contraseña</h2>
+                        <p className="text-gray-600 mb-6 max-w-xs mx-auto">Ingresa y confirma tu nueva contraseña</p>
 
                         <form onSubmit={handleNewPassword}>
                             <PassowordField password={password} setPassword={setPassword} />

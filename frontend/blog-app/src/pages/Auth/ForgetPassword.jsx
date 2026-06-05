@@ -51,13 +51,13 @@ const ForgetPassword = () => {
     }
 
     return (
-        <div className="h-screen flex items-center justify-center bg-zinc-400">
+        <div className="min-h-screen flex items-center justify-center bg-zinc-400" p-4>
             {/* Logo arriba a la izquierda */}
             <div className="absolute top-6 left-6">
                 <img
                     src={Logo}
                     alt="Logo"
-                    className="h-6 md:h-6.5"
+                    className="h-6 md:h-6.5 cursor-pointer"
                     onClick={() => { navigate("/", { replace: true }); }}
                 />
             </div>
@@ -66,7 +66,7 @@ const ForgetPassword = () => {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut" }}
-                className='bg-white/50 backdrop-blur-xl border border-white/50 shadow-2xl rounded-3xl p-8 w-full max-w-md text-center'
+                className='bg-white/50 backdrop-blur-xl border border-white/50 shadow-2xl rounded-3xl p-6 sm:p-8 w-full max-w-sm text-center'
             >
                 {/* Back button */}
                 <div className="flex justify-start mb-4">
@@ -79,10 +79,10 @@ const ForgetPassword = () => {
                 </div>
 
                 {/* Icon */}
-                <LuMail size={70} className='text-gray-500 mx-auto mb-6' />
+                <LuMail size={70} className='text-gray-500 mx-auto mb-6 w-14 h-14 sm:w-16 sm:h-16' />
 
                 {/* Title */}
-                <h1 className="text-2xl font-bold mb-2">¿Olvidaste la contraseña?</h1>
+                <h1 className="text-xl sm:text-2xl font-bold mb-2">¿Olvidaste la contraseña?</h1>
                 <p className="text-gray-700 mb-6 text-sm">
                     Ingresa tu correo y te enviaremos un enlace para restablecerla.
                 </p>
@@ -103,9 +103,9 @@ const ForgetPassword = () => {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-emerald-400 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl w-full disabled:opacity-50 transition"
+                        className="bg-emerald-500 hover:bg-emerald-600 font-medium text-white px-6 py-3 rounded-xl w-full disabled:opacity-50 transition"
                     >
-                        {loading ? "Enviarndo...." : "Solicitar nueva contrasena"}
+                        {loading ? "Enviando...." : "Solicitar nueva contrasena"}
                     </button>
                 </form>
                 <p className="mt-6 text-sm text-emerald-800">

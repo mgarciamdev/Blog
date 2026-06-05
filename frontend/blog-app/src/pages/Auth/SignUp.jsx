@@ -134,8 +134,8 @@ const SignUp = () => {
 
   return (
     <PageTransition>
-      <div className="h-screen w-screen grid grid-cols-1 md:grid-cols-3">
-        <div className="hidden md:flex flex-col justify-center items-center bg-linear-to-br from-zinc-900 via-emerald-900 to-black text-white p-16 col-span-2 relative overflow-hidden">
+      <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+        <div className="hidden md:flex flex-col md:col-span-1 lg:col-span-2 justify-center items-center bg-linear-to-br from-zinc-900 via-emerald-900 to-black text-white p-16 col-span-2 relative overflow-hidden">
           <div className="max-w-2xl text-center">
             <h1 className="text-5xl font-bold leading-tight mb-6">
               Únete a la comunidad
@@ -160,7 +160,7 @@ const SignUp = () => {
             />
           </div>
 
-          <div className="max-w-md w-full flex flex-col justify-center min-h-125">
+          <div className="max-w-md w-full flex flex-col justify-center">
             {step === 2 && (
               <button
                 type="button"
@@ -175,8 +175,8 @@ const SignUp = () => {
               </button>
             )}
 
-            <h1 className="text-2xl font-bold mb-2 ml-10">Crear una cuenta</h1>
-            <p className="text-zinc-800 mb-8 ml-10">
+            <h1 className="text-2xl font-bold mb-2">Crear una cuenta</h1>
+            <p className="text-zinc-800 mb-8">
               {step === 1
                 ? "Unete hoy ingresando tus datos debajo"
                 : "Escoje tu nombre de usuario y sube tu foto de perfil"
@@ -187,7 +187,7 @@ const SignUp = () => {
               className={`transition-opacity duration-700 ${signupSuccess ? "opacity-0 pointer-events-none" : "opacity-100"
                 }`}
             >
-              <form onSubmit={handleSignup} className="space-y-4 ml-10">
+              <form onSubmit={handleSignup} className="space-y-5">
                 {step === 1 && (
                   <>
                     <div className="grid grid-cols-1 gap-5">

@@ -80,7 +80,7 @@ const Verify = () => {
                 : "bg-linear-to-tr from-red-100 to-orange-100"
             }`}
         >
-            <div className="absolute top-6 left-6">
+            <div className="absolute top-4 left-4 md:top-6 md:left-6">
                 <img
                     src={Logo}
                     alt="Logo"
@@ -92,7 +92,7 @@ const Verify = () => {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className="bg-white/40 backdrop-blur-xl border border-white/50 shadow-2xl rounded-3xl p-8 w-full max-w-md text-center"
+                className="bg-white/40 backdrop-blur-xl border border-white/50 shadow-2xl rounded-3xl p-6 md:p-8 w-full max-w-md text-center"
             >
                 <div className="flex justify-start mb-4">
                     <span
@@ -104,12 +104,12 @@ const Verify = () => {
                 </div>
                 {status === "success" ? (
                     <>
-                        <FaCheckCircle className="text-green-500 text-6xl mx-auto mb-6" />
-                        <h1 className="text-2xl font-bold mb-2 text-gray-800">
+                        <FaCheckCircle className="text-green-500 text-5xl md:text-6xl mx-auto mb-6" />
+                        <h1 className="text-xl md:text-2xl font-bold mb-2 text-gray-800">
                             ¡Cuenta verificada!
                         </h1>
 
-                        <p className="text-gray-600 mb-6">
+                        <p className="text-sm md:text-base text-gray-600 mb-6">
                             Tu correo ha sido verificado correctamente.
                             Ahora puedes iniciar sesión y acceder a todas las funciones de la plataforma.
                         </p>
@@ -120,7 +120,7 @@ const Verify = () => {
 
                         <button
                             onClick={() => navigate("/login", { replace: true })}
-                            className="w-full py-3 rounded-xl bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition"
+                            className="w-full py-3 rounded-xl text-sm md:text-base bg-emerald-500 text-white font-semibold hover:bg-emerald-600 transition"
                         >
                             Ir a iniciar sesión
                         </button>

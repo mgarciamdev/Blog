@@ -114,11 +114,11 @@ const Login = () => {
 
   return (
     <PageTransition>
-      <div className="h-screen w-screen grid grid-cols-1 md:grid-cols-3">
+      <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         <div className="relative flex flex-col justify-center px-8 md:px-16 bg-zinc-200 text-black col-span-1">
 
           {/* Logo arriba a la izquierda */}
-          <div className="absolute top-6 left-6">
+          <div className="absolute top-5 left-5">
             <img
               src={Logo}
               alt="Logo"
@@ -127,11 +127,11 @@ const Login = () => {
             />
           </div>
 
-          <div className="max-w-md w-full">
-            <h1 className="text-3xl font-bold mb-2 ml-10">Bienvenidos</h1>
-            <p className="text-zinc-800 mb-8 ml-10">Inicia sesión en tu cuenta</p>
+          <div className="max-w-sm md:max-w-md w-full">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2">Bienvenidos</h1>
+            <p className="text-zinc-800 mb-8">Inicia sesión en tu cuenta</p>
 
-            <form onSubmit={handleLogin} className="space-y-4 ml-10">
+            <form onSubmit={handleLogin} className="space-y-5">
               <label className="text-[13px] text-slate-800 ">Email</label>
               <input
                 type="email"
@@ -139,11 +139,6 @@ const Login = () => {
                 placeholder="tucorreo@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                // onInvalid={(e) => {
-                //   e.target.setCustomValidity(
-                //     'La dirección ingresada no incluye el signo "@"'
-                //   )
-                // }}
                 onInput={(e) => {
                   e.target.setCustomValidity('');
                 }}
@@ -211,7 +206,7 @@ const Login = () => {
               </button>
 
               <p className="text-[13px] text-zinc-900 hover:text-emerald-900 mt-5 cursor-pointer">
-                Todavia no tienes cuenta? {" "}
+                ¿Todavia no tienes cuenta? {" "}
                 <button
                   type="button"
                   className="font-medium text-zinc-900 underline hover:text-emerald-500 cursor-pointer"
@@ -225,7 +220,7 @@ const Login = () => {
         </div>
 
         <div
-          className="hidden md:flex flex-col justify-center items-center bg-linear-to-br from-zinc-900 via-emerald-900 to-black text-white p-16 col-span-2 relative overflow-hidden">
+          className="hidden md:flex flex-col md:col-span-1 lg:col-span-2 justify-center items-center bg-linear-to-br from-zinc-900 via-emerald-900 to-black text-white p-16 col-span-2 relative overflow-hidden">
 
           {/* Glow effect */}
           <div className="absolute w-96 h-96 bg-emerald-500/20 blur-3xl rounded-full top-10 right-10" />
