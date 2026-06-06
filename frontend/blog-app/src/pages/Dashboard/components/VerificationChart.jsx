@@ -16,7 +16,7 @@ const COLORS = [
 
 const VerificationChart = ({ data, totalUsers }) => {
     return (
-        <div className="w-full h-80">
+        <div className="w-full h-72 lg:h-80">
             <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                     <Pie
@@ -25,8 +25,8 @@ const VerificationChart = ({ data, totalUsers }) => {
                         nameKey="name"
                         cx="50%"
                         cy="50%"
-                        innerRadius={100}
-                        outerRadius={130}
+                        innerRadius={70}
+                        outerRadius={95}
                         paddingAngle={4}
                         animationDuration={1200}
                     >
@@ -67,7 +67,7 @@ const VerificationChart = ({ data, totalUsers }) => {
                 </PieChart>
             </ResponsiveContainer>
         </div>
-    )
-}
+    );
+};
 
-export default VerificationChart
+export default VerificationChart;

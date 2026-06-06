@@ -15,7 +15,7 @@ const EngagementSection = ({ stats, loading }) => {
             value: stats?.totalLikes || 0,
         },
         {
-            name: "Comments",
+            name: "Comment",
             value: stats?.totalComments || 0,
         },
         {

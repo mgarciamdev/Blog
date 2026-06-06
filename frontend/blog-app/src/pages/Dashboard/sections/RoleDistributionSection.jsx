@@ -45,7 +45,7 @@ const RoleDistributionSection = ({ stats, loading }) => {
 }
     
     return (
-        <div className="animate-fadeIn mt-4">
+        <div className="animate-fadeIn mt-12">
 
                 {roleData.map((item) => (
                     <RoleProgressCard

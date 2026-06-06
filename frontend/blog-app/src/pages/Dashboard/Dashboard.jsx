@@ -14,7 +14,6 @@ const Dashboard = () => {
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const isSuperAdmin = user?.role === "superadmin";
   const isAdmin = user?.role === "admin";
@@ -23,7 +22,6 @@ const Dashboard = () => {
   const getDashboardData = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       const response = await axiosInstance.get(API_PATHS.DASHBOARD.OBTENER_DASHBOARD);
 

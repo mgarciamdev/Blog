@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import moment from 'moment';
 import { LuClock3 } from 'react-icons/lu';
 
-const DashboardHeader = ({ user, loading }) => {
+const DashboardHeader = ({ user }) => {
     const [currentTime, setCurrentTime] = useState(moment());
 
     useEffect(() => {

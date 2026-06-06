@@ -20,8 +20,8 @@ const PieChartCard = ({ data, colors }) => {
           name="name"
           cx="50%"
           cy="50%"
-          outerRadius={130}
-          innerRadius={100}
+          outerRadius={95}
+          innerRadius={70}
           labelLine={false}
         >
           {data?.map((entry, index) => (

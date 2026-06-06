@@ -81,11 +81,11 @@ const TagInsights = ({ tagUsage = [], loading }) => {
 
     return (
         <div className="animate-fadeIn grid grid-cols-12 mt-4">
-            <div className="col-span-12 md:col-span-7">
+            <div className="col-span-12 xl:col-span-7">
                 <PieChartCard data={processedData} colors={COLORS} />
             </div>
 
-            <div className="col-span-12 md:col-span-5 mt-5 md:mt-0">
+            <div className="col-span-12 xl:col-span-5 mt-5 xl:mt-2">
                 <TagCloud
                     tags={
                         tagUsage.slice(0, 15).map((item) => ({
