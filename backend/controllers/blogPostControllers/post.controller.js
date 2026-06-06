@@ -243,7 +243,14 @@ const getAllPosts = async (req, res) => {
             tags: post.tags,
             author: post.author,
             isDraft: post.isDraft,
+            views: post.views,
+            likes: post.likes,
+            likedBy: post.likedBy,
+            dislikes: post.dislikes,
+            dislikedBy: post.dislikedBy,
+            generatedByAI: post.generatedByAI,
             createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
         }));
 
         res.json({
