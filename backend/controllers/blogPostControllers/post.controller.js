@@ -190,8 +190,12 @@ const getAllPosts = async (req, res) => {
             tag
         } = req.query;
 
+        const parsedLimit = parseInt(limit);
+
         const pageNumber = Math.max(1, parseInt(page));
-        const limitNumber = Math.min(50, parseInt(limit));
+        const limitNumber = Number.isNaN(parsedLimit)
+            ? 10
+            : Math.min(50, parsedLimit);
         const skip = (pageNumber - 1) * limitNumber;
 
         // Filtro base
@@ -222,7 +226,7 @@ const getAllPosts = async (req, res) => {
         // Obtener posts
         const posts = await BlogPost.find(filter)
             .populate("author", "name profileImageUrl")
-            .sort({ createdAt: -1 })
+            .sort({ updatedAt: -1 })
             .skip(skip)
             .limit(limitNumber);
 
@@ -245,9 +249,7 @@ const getAllPosts = async (req, res) => {
             isDraft: post.isDraft,
             views: post.views,
             likes: post.likes,
-            likedBy: post.likedBy,
             dislikes: post.dislikes,
-            dislikedBy: post.dislikedBy,
             generatedByAI: post.generatedByAI,
             createdAt: post.createdAt,
             updatedAt: post.updatedAt,
@@ -269,7 +271,7 @@ const getAllPosts = async (req, res) => {
             filters: {
                 status: status || null,
                 search: search || null,
-                tags: tag || null,
+                tag: tag || null,
             }
         });
 
