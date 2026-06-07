@@ -33,13 +33,13 @@ const App = () => {
 
           {/* Rutas Privadas del Administrador */}
           <Route element={<PrivateRoute allowedRoles={["admin", "superadmin"]} />}>
-            <Route path="/admin/posts" element={<BlogPosts />} />
-            <Route path="/admin/create" element={<BlogPostEditor />} />
+            <Route path="/posts" element={<BlogPosts />} />
+            <Route path="/create" element={<BlogPostEditor />} />
             <Route
-              path="/admin/edit/:postSlug"
+              path="/edit/:postSlug"
               element={<BlogPostEditor isEdit={true} />}
             />
-            <Route path="/admin/comments" element={<Comments />} />
+            <Route path="/comments" element={<Comments />} />
           </Route>
 
           {/* Rutas Privadas de los miembros */}

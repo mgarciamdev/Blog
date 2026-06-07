@@ -90,7 +90,7 @@
 }
 
 .btn-small {
-    @apply flex items-center justify-center gap-3 bg-linear-to-r from-sky-500 to-cyan-400 text-sm font-semibold text-white px-7 py-2 rounded-lg hover:bg-black hover:text-white transition-colors cursor-pointer hover:shadow-2xl hover:shadow-sky-200;
+    @apply flex items-center justify-center gap-3 bg-linear-to-r from-green-600 to-emerald-500 text-sm font-semibold text-white px-7 py-2 rounded-lg hover:bg-black hover:text-white transition-colors cursor-pointer hover:shadow-2xl hover:shadow-sky-200;
 }
 
 .form-card {
