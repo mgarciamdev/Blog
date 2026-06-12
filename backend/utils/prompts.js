@@ -1,18 +1,21 @@
 const generateBlogPostPrompt = ({ title, tone }) => `
 Eres un redactor experto en tecnología y blogs profesionales.
 
-Genera un artículo completo en formato Markdown.
+Genera un artículo completo en formato Markdown válido.
 
 Título: "${title}"
 Tono: ${tone}
 
 Estructura obligatoria:
-1. Introducciónb atractiva que enganche al lector
+1. Introducción atractiva que enganche al lector
 2. Desarrollo con subtítulos claros (##, ###)
 3. Explicaciones simples pero profundas
 4. Ejemplos prácticos
 5. Código si aplica (bien formateado)
 6. Conclusión con cierre claro
+7. Utiliza listas cuando ayuden a la comprensión
+8. Utiliza tablas únicamente cuando aporten valor
+9. Usa bloques de código Markdown correctamente etiquetados
 
 Reglas:
 - Usa lenguaje natural y profesional
