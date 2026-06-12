@@ -330,8 +330,11 @@ const getPostBySlug = async (req, res) => {
                 coverImageUrl: post.coverImageUrl,
                 tags: post.tags,
                 author: post.author,
+                isDraft: post.isDraft,
+                generatedByAI: post.generatedByAI,
                 views: post.views,
                 createdAt: post.createdAt,
+                updatedAt: post.updatedAt,
             },
             interactions: {
                 likes: post.likes,
