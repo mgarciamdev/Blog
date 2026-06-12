@@ -21,7 +21,7 @@ const GenerateBlogPostForm = ({ contentParams, setPostContent, handleCloseForm }
     };
 
     const handleGeneratedBlogPost = async (e) => {
-        e.prevendDefault();
+        e.preventDefault();
 
         const { title, tone } = formData;
 
@@ -41,7 +41,7 @@ const GenerateBlogPostForm = ({ contentParams, setPostContent, handleCloseForm }
                 }
             );
 
-            const generatedPost = aiResponse.data;
+            const generatedPost = aiResponse.data?.content || "";
 
             setPostContent(title, generatedPost || "");
             handleCloseForm();
@@ -58,9 +58,9 @@ const GenerateBlogPostForm = ({ contentParams, setPostContent, handleCloseForm }
     };
 
     return (
-        <div className="w-[90vw] md:w-[35vw] p-7 pb-6 flex flex-col justify-center">
+        <div className="w-[95vw] sm:w-[90vw] md:w-[35vw] p-5 md:p-7 pb-6 flex flex-col justify-center">
             <h3 className="text-lg font-semibold text-black">Generar una entrada de blog</h3>
-            <p className="text-xs text-slate-700 mt-1.25 mb-3">
+            <p className="text-xs text-slate-700 mt-1.5 mb-3">
                 Proporciona un título y un tono para generar tu entrada de blog.
             </p>
 
@@ -68,16 +68,16 @@ const GenerateBlogPostForm = ({ contentParams, setPostContent, handleCloseForm }
                 <AuthInput
                     value={formData.title}
                     onChange={({ target }) => handleChange("title", target.value)}
-                    label="Blog Post Title"
-                    placeholder="Mi primer app en React"
+                    label="Título de la publicación"
+                    placeholder="Mi primera aplicación en React"
                     type="text"
                 />
 
                 <AuthInput
                     value={formData.tone}
                     onChange={({ target }) => handleChange("tone", target.value)}
-                    label="Tone"
-                    placeholder="begginer, friendly, technical, casual, etc"
+                    label="Tono"
+                    placeholder="principiante, técnico, amigable, casual..."
                     type="text"
                 />
 
