@@ -98,10 +98,10 @@ const BlogPosts = () => {
 
   const closeDeleteModal = () => {
     setOpenDeleteAlert({
-        open: false,
-        data: null,
+      open: false,
+      data: null,
     });
-};
+  };
 
   useEffect(() => {
     getAllPosts(1);

@@ -1,6 +1,6 @@
 import React from 'react'
 
-const skeletonLoader = () => {
+const SkeletonLoader = () => {
     return (
         <>
             <div role="status" className="animate-pulse space-y-4 max-w-3xl">
@@ -55,4 +55,4 @@ const skeletonLoader = () => {
     );
 };
 
-export default skeletonLoader;
+export default SkeletonLoader;

@@ -40,3 +40,17 @@ export const roleAvatarStyles = {
     admin: "ring-emerald-200",
     member: "ring-sky-200",
 };
+
+export const getToastMessagesByType = (type) => {
+    switch (type) {
+        case "edit":
+            return "Publicación de blog actualizada exitosamente";
+        case "draft":
+            return "Entrada de blog guardada como borrador correctamente";
+        case "published":
+            return "Publicación de blog publicada con éxito";
+
+        default:
+            return "Publicación de blog publicada con éxito";
+    }
+};

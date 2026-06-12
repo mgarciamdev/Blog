@@ -85,9 +85,16 @@ const SideMenu = ({ closeMenu, isBlogMenu }) => {
 
             {/* Menú Dinámico */}
             {finalMenu.map((item, index) => {
-                const isActive = location.pathname === item.path || item.children?.some(
-                    (sub) => sub.path === location.pathname
-                );
+                const isActive =
+                    item.path === "/posts"
+                        ? (
+                            location.pathname === "/posts" ||
+                            location.pathname.startsWith("/create") ||
+                            location.pathname.startsWith("/edit")
+                        ) : (
+                            location.pathname === item.path ||
+                            item.children?.some((sub) => sub.path === location.pathname)
+                        );
                 return (
                     <div key={`menu_${index}`} className="w-full">
                         <button
