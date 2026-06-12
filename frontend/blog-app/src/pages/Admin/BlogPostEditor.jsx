@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import DashboardLayout from '../../components/Layouts/DashboardLayout';
 import MDEditor, { commands } from '@uiw/react-md-editor'
-import { LuLoaderCircle, LuSave, LuSend, LuSparkles, LuTrash2 } from 'react-icons/lu';
+import { LuArrowLeftToLine, LuLoaderCircle, LuSave, LuSend, LuSparkles, LuTrash2 } from 'react-icons/lu';
 import axiosInstance from '../../utils/axiosInstance';
 import { API_PATHS } from '../../utils/apiPaths';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -221,13 +221,23 @@ const BlogPostEditor = ({ isEdit }) => {
       <div className="my-5">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-5 my-4">
           <div className="form-card p-6 col-span-12 md:col-span-8">
+
+            <div className="flex justify-start mb-4">
+              <button
+                onClick={() => navigate("/posts")}
+                className="flex items-center gap-2.5 text-[13px] font-medium text-emerald-500 bg-green-50/60 rounded px-1.5 md:px-3 py-1 border border-emerald-50 hover:border-emerald-400 cursor-pointer hover:scale-[1.02] transition-all"
+              >
+                <LuArrowLeftToLine /> Regresar a Posts
+              </button>
+            </div>
+
             <div className="flex items-center justify-between">
 
               <h2 className="text-base md:text-lg font-medium">
                 {!isEdit ? "Añadir nueva publicación" : "Editar publicación"}
               </h2>
 
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center gap-3">
                 {isEdit && (
                   <button
                     className="flex items-center gap-2.5 text-[13px] font-medium text-rose-500 bg-rose-50/60 rounded px-1.5 md:px-3 py-1 md:py-0.75 border border-rose-50 hover:border-rose-300 cursor-pointer hover:scale-[1.02] transition-all"
@@ -341,15 +351,6 @@ const BlogPostEditor = ({ isEdit }) => {
                   handleValueChange("tags", data);
                 }}
               />
-
-              <div className="mt-3 flex justify-center">
-                <button
-                  onClick={() => navigate("/posts")}
-                  className="flex items-center gap-2.5 text-[13px] font-medium text-emerald-600 hover:text-white hover:bg-linear-to-r hover:from-green-500 hover:to-emerald-500 rounded px-3 py-0.75 border border-emerald-500 hover:border-emerald-100  cursor-pointer transition-all"
-                >
-                  Regresar a Posts
-                </button>
-              </div>
             </div>
           </div>
 
