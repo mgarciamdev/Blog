@@ -27,7 +27,7 @@ router.get("/", protect, authorize("admin", "superadmin"), getAllComments);
 /**
  * Obtener los comentarios por post
  */
-router.get("/:postId", getCommentsByPost);
+router.get("/post/:postId", getCommentsByPost);
 
 /**
  * Actualizar comentario

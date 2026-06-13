@@ -73,6 +73,7 @@ const getAllComments = async (req, res) => {
     try {
         const comments = await Comment.find()
             .populate("author", "name profileImageUrl")
+            .populate("post", "title slug")
             .sort({ createdAt: 1 })
             .lean();
 
@@ -99,7 +100,7 @@ const getAllComments = async (req, res) => {
             }
 
             if (r.type === "like") reactionMap[id].likes++;
-            if (r.type === "dislike") reactionMap[id].likes++;
+            if (r.type === "dislike") reactionMap[id].dislikes++;
 
             if (req.user && r.user.toString() === req.user._id.toString()) {
                 reactionMap[id].userReaction = r.type;
@@ -111,7 +112,7 @@ const getAllComments = async (req, res) => {
         comments.forEach(comment => {
             const data = reactionMap[comment._id.toString()] || {};
 
-            comment.like = data.likes || 0;
+            comment.likes = data.likes || 0;
             comment.dislikes = data.dislikes || 0;
 
             comment.likedByUser = data.userReaction === "like";
@@ -326,7 +327,7 @@ const updateComment = async (req, res) => {
         const isOwner = comment.author.toString() === req.user._id.toString();
         const isAdmin = ["admin", "superadmin"].includes(req.user.role);
 
-        if (!isOwner && isAdmin) {
+        if (!isOwner && !isAdmin) {
             return res.status(403).json({
                 message: "No autorizado para editar este comentario",
             });
