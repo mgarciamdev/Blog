@@ -73,7 +73,7 @@ const getAllComments = async (req, res) => {
     try {
         const comments = await Comment.find()
             .populate("author", "name profileImageUrl")
-            .populate("post", "title slug")
+            .populate("post", "title slug coverImageUrl")
             .sort({ createdAt: 1 })
             .lean();
 
