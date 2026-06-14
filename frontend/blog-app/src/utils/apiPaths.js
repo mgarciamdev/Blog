@@ -55,7 +55,7 @@ export const API_PATHS = {
     COMENTARIOS: {
         CREAR_COMENTARIO: (postId) => `/api/comments/${postId}`, // Añade un comentario a un post especifico
         OBTENER_TODOS_LOS_COMENTARIOS: "/api/comments", // Obtiene todos los comentarios realizados
-        OBTENER_TODOS_LOS_COMENTARIOS_POR_POST: (postId) => `/api/comments/${postId}`, // Obtiene todos los comentarios de un post especifico
+        OBTENER_TODOS_LOS_COMENTARIOS_POR_POST: (postId) => `/api/comments/post/${postId}`, // Obtiene todos los comentarios de un post especifico
         ACTUALIZAR_COMENTARIO: (commentId) => `/api/comments/${commentId}`, // Actualiza el contenido del comentario
         ELIMINAR_COMENTARIO: (commentId) => `/api/comments/${commentId}`, // Elimina el comentario especifico por su id
 
