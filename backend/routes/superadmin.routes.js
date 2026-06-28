@@ -1,5 +1,5 @@
 const express = require("express");
-const { createAdmin } = require("../controllers/superadmin/superAdmin.controller");
+const { createAdmin, updateUserRole } = require("../controllers/superadmin/superAdmin.controller");
 const { protect } = require("../middlewares/authMiddleware");
 const { authorize } = require("../middlewares/authorizeMiddleware");
 
@@ -11,6 +11,11 @@ router.post(
     protect,
     authorize("superadmin"),
     createAdmin
+);
+
+router.patch(
+    "/users/:id/role",
+    updateUserRole
 );
 
 module.exports = router;

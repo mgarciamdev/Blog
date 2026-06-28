@@ -26,7 +26,6 @@ const UserSchema = new mongoose.Schema(
 
         //Estados rapidos
         isBanned: { type: Boolean, default: false },
-        strikesCount: { type: Number, default: 0, min: 0 },
     },
     { timestamps: true }
 );

@@ -3,13 +3,14 @@ export const BASE_URL = "http://localhost:8000";
 export const API_PATHS = {
     SUPERADMIN: {
         CREAR: "/api/superadmin/admin", // Crea un usuario con rol admin
+        ACTUALIZAR_ROL_DE_USUARIO: (id) => `/api/superadmin/users/${id}/rol`, // Actualiza el rol del usuario ADMIN -> MEMBER -> ADMIN
     },
 
     ADMIN: {
         OBTENER_TODOS_LOS_USUARIOS: "/api/admin/users", // Obtiene todos los usuarios
         OBTENER_USUARIO_POR_ID: (id) => `/api/admin/users/${id}`, // Obtiene al usuario por su id
         ELIMINAR_USUARIO: (id) => `/api/admin/users/${id}`, // Elimina al usuario por su id
-        ACTUALIZAR_ROL_DE_USUARIO: (id) => `/api/admin/users/${id}`, // Actualiza el rol del usuario ADMIN -> MEMBER -> ADMIN
+        ACTUALIZAR_PERFIL_USUARIO: (id) => `/api/admin/users/${id}/profile`, //Admin o superadmin pueden modificar el perfil si incumple las reglas
     },
 
     AUTH: {

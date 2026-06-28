@@ -1,5 +1,5 @@
 const User = require("../../models/User");
-const { getModerationStatsByUser } = require("../../services/moderation.service");
+const { getModerationStatsByUser, calculateActiveStrikePoints } = require("../../services/moderation.service");
 
 // @desc    Get user (admin view)
 // @route   GET /api/admin/users/:id
@@ -10,7 +10,7 @@ const getUserByIdAdmin = async (req, res) => {
 
         const user = await User.findById(id)
             .select(
-                "username name email role isVerified isDeleted createdAt lastUsernameChange lastLogin"
+                "username name email role isVerified createdAt lastUsernameChange"
             );
 
         if (!user) {
@@ -120,17 +120,28 @@ const getAllUsers = async (req, res) => {
 
         // obtener usuarios
         const users = await User.find(query)
-            .select("-password -refreshToken")
+            .select("-password -refreshToken -lastPasswordChange -lastUsernameChange -verificationToken -vfTokenExpires -resetPasswordToken -resetPasswordExpires")
             .sort({ [sortField]: -1 })
             .skip(skip)
             .limit(limitNumber);
+
+        const usersWithModeration = await Promise.all(
+            users.map(async (user) => {
+                const activeStrikePoints = await calculateActiveStrikePoints(user._id);
+
+                return {
+                    ...user.toObject(),
+                    activeStrikePoints,
+                };
+            })
+        );
 
         res.json({
             total,
             page: pageNumber,
             pages: Math.ceil(total / limitNumber),
-            results: users.length,
-            users
+            results: usersWithModeration.length,
+            users: usersWithModeration,
         });
 
     } catch (error) {
@@ -141,72 +152,36 @@ const getAllUsers = async (req, res) => {
     }
 };
 
-// @desc    Update user role
-// @route   PATCH /api/admin/users/:userId/role
+// @desc    Update user profile (admin || superadmin)
+// @route   GET /api/admin/users/:id/profile
 // @access  Private (admin | superadmin)
-const updateUserRole = async (req, res) => {
+const updateUserProfileAdmin = async (req, res) => {
     try {
         const { id } = req.params;
-        const { role } = req.body;
+        const { name, bio, profileImageUrl } = req.body;
 
-        const allowedRoles = ["member", "admin", "superadmin"];
+        const user = await User.findById(id);
 
-        if (!allowedRoles.includes(role)) {
-            return res.status(400).json({
-                message: "Rol inválido"
-            });
-        }
-
-        if (req.user._id.toString() === id) {
-            return res.status(400).json({
-                message: "No puedes cambiar tu propio rol"
-            });
-        }
-
-        const userToUpdate = await User.findById(id);
-
-        if (!userToUpdate) {
+        if (!user) {
             return res.status(404).json({
                 message: "Usuario no encontrado"
             });
         }
 
-        if (userToUpdate.role === "superadmin") {
-            return res.status(403).json({
-                message: "No puedes modificar un superadmin"
-            });
-        }
+        user.name = name ?? user.name;
+        user.bio = bio ?? user.bio;
+        user.profileImageUrl = profileImageUrl ?? user.profileImageUrl;
 
-        // Reglas para admin
-        if (req.user.role === "admin") {
-            if (role === "superadmin") {
-                return res.status(403).json({
-                    message: "No puedes asignar superadmin"
-                });
-            }
-
-            if (userToUpdate.role === "admin") {
-                return res.status(403).json({
-                    message: "No puedes modificar otro admin"
-                });
-            }
-        }
-
-        userToUpdate.role = role;
-        await userToUpdate.save();
+        await user.save();
 
         res.json({
-            message: "Rol actualizado correctamente",
-            user: {
-                id: userToUpdate._id,
-                username: userToUpdate.username,
-                role: userToUpdate.role
-            }
+            message: "Perfil actualizado correctamente",
+            user
         });
 
     } catch (error) {
         res.status(500).json({
-            message: "Error al actualizar rol",
+            message: "Error al actualizar perfil",
             error: error.message
         });
     }
@@ -216,5 +191,5 @@ module.exports = {
     getUserByIdAdmin,
     deleteUser,
     getAllUsers,
-    updateUserRole
+    updateUserProfileAdmin
 };

@@ -14,6 +14,7 @@ import SignUp from "./pages/Auth/SignUp";
 import ForgetPassword from "./pages/Auth/ForgetPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import Verify from "./pages/Auth/Verify";
+import Users from "./pages/Admin/Users";
 
 const App = () => {
   return (
@@ -40,6 +41,7 @@ const App = () => {
               element={<BlogPostEditor isEdit={true} />}
             />
             <Route path="/comments" element={<Comments />} />
+            <Route path="/users" element={<Users />} />
           </Route>
 
           {/* Rutas Privadas de los miembros */}

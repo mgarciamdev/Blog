@@ -129,14 +129,13 @@ const removeStrike = async (req, res) => {
             });
         }
 
-        strike.status = "revocado";
-
         if (strike.status === "revocado") {
             return res.status(400).json({
                 message: "El strike ya fue revocado"
             });
         }
 
+        strike.status = "revocado";
         await strike.save();
 
         // recalculamos

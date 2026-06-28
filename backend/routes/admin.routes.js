@@ -5,7 +5,7 @@ const {
     getAllUsers,
     getUserByIdAdmin,
     deleteUser,
-    updateUserRole
+    updateUserProfileAdmin,
 } = require("../controllers/admin/admin.controller");
 
 const { protect } = require("../middlewares/authMiddleware");
@@ -31,9 +31,9 @@ router.delete(
     deleteUser
 );
 
-router.patch(
-    "/users/:id/role",
-    updateUserRole
+router.put(
+    "/users/:id/profile",
+    updateUserProfileAdmin
 );
 
 module.exports = router;
