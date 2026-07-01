@@ -65,7 +65,6 @@ const SignUp = () => {
   useEffect(() => {
     if (debounceUsername.trim().length <= 2) return;
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     checkUsername(debounceUsername);
   }, [debounceUsername]);
 

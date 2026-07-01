@@ -10,7 +10,7 @@ const Users = () => {
                 <h2 className="text-2xl font-semibold mb-5">
                     Manejo de Usuarios
                 </h2>
-                <p className="text-md text-gray-500 mb-2">
+                <p className="text-md text-gray-500 -mt-3 mb-2">
                     Gestión de miembros y personal administrativo
                 </p>
 

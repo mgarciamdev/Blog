@@ -1,15 +1,23 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import axiosInstance from '../../../utils/axiosInstance';
 import { API_PATHS } from '../../../utils/apiPaths';
 import toast from 'react-hot-toast';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import EditUserForm from './EditUserForm';
-import { LuEllipsisVertical, LuPencil, LuTrash2, LuSearch } from "react-icons/lu";
+import { LuEllipsisVertical, LuPencil, LuTrash2, LuSearch, LuPlus } from "react-icons/lu";
 import DeleteAlertContent from '../../../components/DeleteAlertContent';
 import Modal from '../../../components/Modal';
 import DropDownSelect from '../../../components/Inputs/DropdownSelect';
+import { UserContext } from '../../../context/userContext';
+import CreateUserForm from './CreateUserForm';
+import { canManageUser, canCreateAdmin } from '../../../utils/permissions';
+import dayjs from "dayjs";
+import "dayjs/locale/es";
+import DropdownSelect from '../../../components/Inputs/DropdownSelect';
 
 const UsersDataTable = () => {
+    dayjs.locale("es");
 
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -18,6 +26,7 @@ const UsersDataTable = () => {
     const [usersPerPage, setUsersPerPage] = useState(10);
     const [selectedUser, setSelectedUser] = useState(null);
     const [openEditModal, setOpenEditModal] = useState(false);
+    const [openCreateModal, setOpenCreateModal] = useState(false);
     const [openDeleteAlert, setOpenDeleteAlert] = useState({
         open: false,
         data: null,
@@ -25,6 +34,8 @@ const UsersDataTable = () => {
     const [openMenu, setOpenMenu] = useState(null);
     const [roleFilter, setRoleFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
+
+    const { user } = useContext(UserContext);
 
     const getAllUsers = async () => {
         try {
@@ -129,12 +140,43 @@ const UsersDataTable = () => {
 
     const options = [10, 15, 20, 25, 30];
 
+    const pageNumbers = [];
+
+    if (totalPages <= 7) {
+        for (let i = 1; i <= totalPages; i++) {
+            pageNumbers.push(i);
+        }
+    } else {
+        if (currentPage <= 3) {
+            pageNumbers.push(1, 2, 3, "...", totalPages);
+        } else if (currentPage >= totalPages - 2) {
+            pageNumbers.push(1, "...", totalPages - 2, totalPages - 1, totalPages);
+        } else {
+            pageNumbers.push(1, "...", currentPage - 1, currentPage, currentPage + 1, totalPages);
+        }
+    }
+
     return (
         <div>
-            <h2 className="text-xl font-semibold">Directorio de Usuarios</h2>
-            <p className="text-sm text-gray-500 mt-1 mb-4">
-                Sistema de usuarios ({filteredUsers.length} usuarios)
-            </p>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+                <div>
+                    <h2 className="text-2xl font-semibold">Directorio de Usuarios</h2>
+                    <p className="text-sm text-gray-500 mt-1 mb-4">
+                        Sistema de usuarios ({filteredUsers.length} usuarios)
+                    </p>
+                </div>
+
+                {canCreateAdmin(user) && (
+                    <button
+                        className="btn-small mt-4 md:mt-0"
+                        onClick={() => {
+                            setOpenCreateModal(true);
+                        }}
+                    >
+                        <LuPlus className="text-[18px]" /> Añadir Usuario
+                    </button>
+                )}
+            </div>
             <div className="flex flex-col lg:flex-row mb-6 gap-4">
                 {/* Search */}
                 <div className="relative flex-1">
@@ -211,19 +253,6 @@ const UsersDataTable = () => {
                     ]}
                 />
 
-                {/* Usuarios por página */}
-                <DropDownSelect
-                    value={usersPerPage}
-                    onChange={(value) => {
-                        setUsersPerPage(Number(value));
-                        setCurrentPage(1);
-                    }}
-                    className="min-w-37.5"
-                    options={options.map((option) => ({
-                        value: option,
-                        label: `${option} por página`,
-                    }))}
-                />
             </div>
 
             <div className="w-full overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
@@ -240,6 +269,7 @@ const UsersDataTable = () => {
                                 <th className="w-64 px-4 py-3">Correo Electronico</th>
                                 <th className="w-56 px-4 py-3">Nombre de Usuario</th>
                                 <th className="w-36 px-4 py-3">Rol</th>
+                                <th className="w-36 px-4 py-3 text-sm">Fecha de registro</th>
                                 <th className="w-40 px-4 py-3">Estado</th>
                                 <th className="w-44 px-4 py-3 hidden lg:table-cell">Estado de Ban</th>
                                 <th className="w-20 px-4 py-3 hidden lg:table-cell">Strikes</th>
@@ -274,7 +304,9 @@ const UsersDataTable = () => {
                                                 {roleBadge[usuario.role].label}
                                             </span>
                                         </td>
-
+                                        <td className="px-4 py-3">
+                                            {dayjs(usuario.createdAt).format("DD MMM YYYY")}
+                                        </td>
                                         <td className="px-4 py-3">
                                             {usuario.isVerified ? (
                                                 <span className="px-6 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
@@ -308,18 +340,19 @@ const UsersDataTable = () => {
                                         <td className="px-4 py-3 hidden lg:table-cell">{usuario.activeStrikePoints}</td>
                                         <td className="px-4 py-3">
                                             <div className="relative inline-block">
-                                                {usuario.role === "admin" || usuario.role === "superadmin" ? (
+                                                {!canManageUser(user, usuario) ? (
                                                     <span className="">
                                                         <LuEllipsisVertical size={18} title="Acciones Bloqueadas" />
                                                     </span>
                                                 ) : (
                                                     <>
                                                         <button
-                                                            onClick={() => setOpenMenu(
-                                                                openMenu === usuario._id
-                                                                    ? null
-                                                                    : usuario._id
-                                                            )}
+                                                            onClick={
+                                                                () => setOpenMenu(
+                                                                    openMenu === usuario._id
+                                                                        ? null
+                                                                        : usuario._id
+                                                                )}
                                                             className="p-2 rounded-lg hover:bg-gray-100"
                                                         >
                                                             <LuEllipsisVertical size={18} />
@@ -337,7 +370,7 @@ const UsersDataTable = () => {
                                                                         setOpenMenu(null);
                                                                     }}
                                                                 >
-                                                                    <LuPencil />
+                                                                    <LuPencil className="text-blue-400" />
                                                                 </button>
 
                                                                 <button
@@ -364,8 +397,92 @@ const UsersDataTable = () => {
                             </motion.tbody>
                         </AnimatePresence>
                     </table>
-                )}
+                )
+                }
+            </div >
+
+            <div className="flex flex-col md:flex-row items-center justify-between mt-6 gap-4">
+                {/* Información */}
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <span>Filas por página</span>
+
+                    <DropdownSelect
+                        value={usersPerPage}
+                        onChange={(value) => {
+                            setUsersPerPage(Number(value));
+                            setCurrentPage(1);
+                        }}
+                        className="min-w-24"
+                        options={options.map(opt => ({
+                            value: opt,
+                            label: opt
+                        }))}
+                    />
+
+                    <span>
+                        de {filteredUsers.length} filas
+                    </span>
+                </div>
+
+                {/* Navegación */}
+                <div className="flex items-center gap-2">
+
+                    <button
+                        onClick={() => setCurrentPage(1)}
+                        disabled={currentPage === 1}
+                        className="w-7 h-7 rounded-2xl border hover:bg-gray-100 disabled:opacity-40"
+                    >
+                        {"<<"}
+                    </button>
+
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="w-7 h-7 rounded-2xl border hover:bg-gray-100 disabled:opacity-40"
+                    >
+                        {"<"}
+                    </button>
+
+                    {pageNumbers.map((page, index) =>
+                        page === "..." ? (
+                            <span
+                                key={index}
+                                className="px-2"
+                            >
+                                ...
+                            </span>
+                        ) : (
+                            <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`w-7 h-7 rounded-2xl transition ${currentPage === page
+                                    ? "bg-slate-700 text-white"
+                                    : "border hover:bg-gray-100"
+                                }`}
+                            >
+                                {page}
+                            </button>
+                        )
+                    )}
+
+                    <button
+                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                        disabled={currentPage === totalPages}
+                        className="w-7 h-7 rounded-2xl border hover:bg-gray-100 disabled:opacity-40"
+                    >
+                        {">"}
+                    </button>
+
+                    <button
+                        onClick={() => setCurrentPage(totalPages)}
+                        disabled={currentPage === totalPages}
+                        className="w-7 h-7 rounded-2xl border hover:bg-gray-100 disabled:opacity-40"
+                    >
+                        {">>"}
+                    </button>
+                </div>
             </div>
+
             {openDeleteAlert.open && (
                 <Modal
                     isOpen={openDeleteAlert?.open}
@@ -384,14 +501,20 @@ const UsersDataTable = () => {
                 </Modal>
             )}
 
-            <EditUserForm
+            < EditUserForm
                 user={selectedUser}
                 isOpen={openEditModal}
                 onClose={() => setOpenEditModal(false)}
                 onUserUpdated={getAllUsers}
             />
 
-        </div>
+            <CreateUserForm
+                isOpen={openCreateModal}
+                onClose={() => setOpenCreateModal(false)}
+                onUserCreated={getAllUsers}
+            />
+
+        </div >
     );
 };
 

@@ -14,32 +14,44 @@ const createAdmin = async (req, res) => {
             });
         }
 
+        const normalizedEmail = email.trim().toLowerCase();
+        const normalizedUsername = username.trim().toLowerCase();
+        const normalizedName = name.trim();
+
+        if (password.length < 12) {
+            return res.status(400).json({
+                message: "La contraseña debe contener al menos 12 caracteres"
+            });
+        }
+
         const exists = await User.findOne({
             $or: [
-                { email: email.toLowerCase() },
-                { username: username.toLowerCase() }
+                { email: normalizedEmail },
+                { username: normalizedUsername }
             ]
         });
 
         if (exists) {
-            return res.status(400).json({ 
-                message: "El email o nombre de usuario ya están registrados" 
+            return res.status(400).json({
+                message: "El email o nombre de usuario ya están registrados"
             });
         }
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        const admin = await User.create({
-            username: username.toLowerCase(),
-            name,
-            email: email.toLowerCase(),
+        const adminData = {
+            username: normalizedUsername,
+            name: normalizedName,
+            email: normalizedEmail,
             password: hashedPassword,
             profileImageUrl: profileImageUrl || null,
-            bio: bio || "",
+            bio: bio?.trim() || "",
             role: "admin",
             isVerified: true,
-        });
+        };
+
+        const admin = await User.create(adminData);
 
         res.status(201).json({
             message: "Admin creado exitosamente",
@@ -51,6 +63,8 @@ const createAdmin = async (req, res) => {
         });
 
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
             message: "Error del servidor"
         });
