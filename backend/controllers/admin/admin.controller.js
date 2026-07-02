@@ -1,5 +1,6 @@
 const User = require("../../models/User");
 const { getModerationStatsByUser, calculateActiveStrikePoints } = require("../../services/moderation.service");
+const exportUsersService = require("../services/export/exportUsers.service");
 
 // @desc    Get user (admin view)
 // @route   GET /api/admin/users/:id
@@ -187,9 +188,52 @@ const updateUserProfileAdmin = async (req, res) => {
     }
 };
 
+// @desc    Export users management list to formats csv, xlsx and pdf
+// @route   GET /api/admin/users/export/:format
+// @access  Private (admin | superadmin)
+const exportUsers = async (req, res) => {
+    try {
+        const {format} = req.params;
+
+        const allowedFormats = [
+            "csv",
+            "xlsx",
+            "pdf"
+        ];
+
+        if (!allowedFormats.includes(format)) {
+            return res.status(400).json({
+                message: "Formato no soportado"
+            });
+        }
+
+        const result = await exportUsersService(format);
+
+        res.setHeader(
+            "Content-Type",
+            result.contentType
+        );
+
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="${result.filename}"`
+        );
+
+        return res.send(result.buffer);
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Error al exportar usuarios"
+        });
+    }
+};
+
 module.exports = {
     getUserByIdAdmin,
     deleteUser,
     getAllUsers,
-    updateUserProfileAdmin
+    updateUserProfileAdmin,
+    exportUsers
 };

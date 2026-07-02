@@ -6,18 +6,19 @@ const {
     getUserByIdAdmin,
     deleteUser,
     updateUserProfileAdmin,
+    exportUsers,
 } = require("../controllers/admin/admin.controller");
 
 const { protect } = require("../middlewares/authMiddleware");
 const { authorize } = require("../middlewares/authorizeMiddleware");
 
 router.use(
-    protect, 
+    protect,
     authorize("admin", "superadmin")
 );
 
 router.get(
-    "/users", 
+    "/users",
     getAllUsers
 );
 
@@ -34,6 +35,11 @@ router.delete(
 router.put(
     "/users/:id/profile",
     updateUserProfileAdmin
+);
+
+router.get(
+    "/users/export/:format",
+    exportUsers
 );
 
 module.exports = router;
