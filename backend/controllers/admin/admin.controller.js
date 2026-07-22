@@ -1,6 +1,6 @@
 const User = require("../../models/User");
 const { getModerationStatsByUser, calculateActiveStrikePoints } = require("../../services/moderation.service");
-const exportUsersService = require("../services/export/exportUsers.service");
+const exportUsersService = require("../../services/export/exportUsers.service");
 
 // @desc    Get user (admin view)
 // @route   GET /api/admin/users/:id
@@ -207,7 +207,12 @@ const exportUsers = async (req, res) => {
             });
         }
 
-        const result = await exportUsersService(format);
+        const result = await exportUsersService(
+            format,
+            req.user
+        );
+
+        console.log(req.user);
 
         res.setHeader(
             "Content-Type",

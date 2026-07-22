@@ -9,7 +9,7 @@ const protect = async (req, res, next) => {
         if (token && token.startsWith("Bearer")) {
             token = token.split(" ")[1]; // Extrae el Token
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            req.user = await User.findById(decoded.id).select("_id role isVerified"); // Remplazamos el "-password" y colocamos ahora "_id role isVerified" para mas seguridad
+            req.user = await User.findById(decoded.id).select("_id name role isVerified"); // Remplazamos el "-password" y colocamos ahora "_id role isVerified" para mas seguridad
             next();
         } else {
             res.status(401).json({ message: "No autorizado, no hay token" });
