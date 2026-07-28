@@ -54,7 +54,7 @@ const exportUsersService = async (format, currentUser) => {
         case "pdf":
             return pdfExporter(
                 normalizedUsers,
-                currentUser
+                currentUser.name
             );
 
         default:

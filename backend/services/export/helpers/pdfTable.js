@@ -1,26 +1,12 @@
 const userColumns = require("./userColumns");
+const drawPdfWatermark = require("./pdfWatermark");
 
-const drawPdfTable = (doc, users) => {
+const rowHeight = 22;
 
-    const startX = doc.page.margins.left;
-    let currentY = doc.y;
-
-    const rowHeight = 22;
-
-    // Columnas que se usarán en el PDF
-    const columns = [
-        { key: "name", width: 130 },
-        { key: "username", width: 90 },
-        { key: "email", width: 210 },
-        { key: "role", width: 110 },
-        { key: "verified", width: 95 },
-        { key: "banned", width: 55 },
-        { key: "strikes", width: 110 },
-    ];
-
-    // ==========================
-    // HEADER
-    // ==========================
+// =====================================
+// Encabezado de la tabla
+// =====================================
+const drawTableHeader = (doc, columns, startX, currentY) => {
 
     let x = startX;
 
@@ -35,7 +21,7 @@ const drawPdfTable = (doc, users) => {
             .font("Helvetica-Bold")
             .fontSize(9)
             .text(
-                userColumns.find(c => c.key === column.key)?.header || "",
+                userColumns.find(c => c.key === column.key)?.header ?? "",
                 x + 3,
                 currentY + 6,
                 {
@@ -45,9 +31,41 @@ const drawPdfTable = (doc, users) => {
             );
 
         x += column.width;
+
     });
 
-    currentY += rowHeight;
+    return currentY + rowHeight;
+
+};
+
+const drawPdfTable = (doc, users) => {
+
+    const startX = doc.page.margins.left;
+
+    const bottomMargin = 55;
+
+    const columns = [
+        { key: "name", width: 130 },
+        { key: "username", width: 90 },
+        { key: "email", width: 210 },
+        { key: "role", width: 110 },
+        { key: "verified", width: 95 },
+        { key: "banned", width: 85 },
+        { key: "strikes", width: 60 },
+    ];
+
+    // =====================================
+    // Primer Encabezado
+    // =====================================
+
+    let currentY = doc.y + 20;
+
+    currentY = drawTableHeader(
+        doc,
+        columns,
+        startX,
+        currentY
+    );
 
     // ==========================
     // FILAS
@@ -55,21 +73,34 @@ const drawPdfTable = (doc, users) => {
 
     users.forEach((user, index) => {
 
-        // Salto de página automático
-        if (currentY > doc.page.height - 70) {
+        // -----------------------------
+        // ¿ Cabe otra fila?
+        // -----------------------------
+        if (currentY + rowHeight > doc.page.height - bottomMargin) {
+
             doc.addPage();
-            currentY = 50;
+
+            drawPdfWatermark(doc);
+
+            currentY = 40;
+
+            currentY = drawTableHeader(
+                doc,
+                columns,
+                startX,
+                currentY
+            );
         }
 
-        x = startX;
+        let x = startX;
 
-        const zebraBackground = index % 2 === 0
-            ? "#FFFFFF"
-            : "#F9FAFB";
+        const zebraBackground =
+            index % 2 === 0
+                ? "#FFFFFF"
+                : "#F9FAFB";
 
         columns.forEach((column) => {
 
-            // Fondo por defecto (zebra)
             let cellBackground = zebraBackground;
 
             // =====================================
@@ -101,21 +132,14 @@ const drawPdfTable = (doc, users) => {
             // =====================================
 
             if (column.key === "verified") {
-
-                if (user.verified === "Verificado") {
-
-                    cellBackground = "#ECFDF5";
-
-                } else {
-
-                    cellBackground = "#FEF2F2";
-
-                }
-
+                cellBackground =
+                    user.verified === "Verificado"
+                        ? "#ECFDF5"
+                        : "#FEF2F2";
             }
 
             // =====================================
-            // Estado de Moderación
+            // Estado
             // =====================================
 
             if (column.key === "banned") {
@@ -142,7 +166,7 @@ const drawPdfTable = (doc, users) => {
 
             }
 
-            // Dibujar celda
+            // Celda
             doc
                 .rect(x, currentY, column.width, rowHeight)
                 .fillAndStroke(cellBackground, "#E5E7EB");
@@ -151,16 +175,17 @@ const drawPdfTable = (doc, users) => {
             doc
                 .fillColor("#111827")
                 .font("Helvetica")
-                .fontSize(8)
+                .fontSize(8.5)
                 .text(
                     String(user[column.key] ?? ""),
                     x + 3,
                     currentY + 6,
                     {
                         width: column.width - 6,
-                        align: column.key === "email"
-                            ? "left"
-                            : "center",
+                        align:
+                            column.key === "email"
+                                ? "left"
+                                : "center",
                     }
                 );
 
@@ -171,8 +196,6 @@ const drawPdfTable = (doc, users) => {
         currentY += rowHeight;
 
     });
-
-    doc.moveDown(2);
 
 };
 

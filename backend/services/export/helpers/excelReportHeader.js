@@ -1,10 +1,23 @@
 const { formatDate } = require("../../../utils/exportHelper");
 
-const userColumns = require("./userColumns");
+// Convierte un número de columna (1, 2, 3...) a su letra de Excel (A, B, ..., Z, AA...)
+// (usada para calcular hasta dónde llega el merge del título, según cuántas columnas tenga la tabla)
+const columnLetter = (colNumber) => {
+    let letter = "";
+    let n = colNumber;
+    while (n > 0) {
+        const remainder = (n - 1) % 26;
+        letter = String.fromCharCode(65 + remainder) + letter;
+        n = Math.floor((n - 1) / 26);
+    }
+    return letter;
+};
 
-const drawExcelReportHeader = (worksheet, { title, generatedBy, totalUsers, stats, }) => {
+const drawExcelReportHeader = (worksheet, { title, generatedBy, totalUsers, stats, totalColumns, }) => {
 
-    worksheet.mergeCells("A1:I1");
+    const lastColumn = columnLetter(totalColumns);
+
+    worksheet.mergeCells(`A1:${lastColumn}1`);
     worksheet.getCell("A1").value = "Blog Platform";
     worksheet.getCell("A1").font = {
         size: 20,
@@ -14,7 +27,7 @@ const drawExcelReportHeader = (worksheet, { title, generatedBy, totalUsers, stat
         horizontal: "center",
     };
 
-    worksheet.mergeCells("A2:I2");
+    worksheet.mergeCells(`A2:${lastColumn}2`);
     worksheet.getCell("A2").value = title;
     worksheet.getCell("A2").font = {
         size: 16,

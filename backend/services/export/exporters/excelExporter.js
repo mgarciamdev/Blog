@@ -2,7 +2,26 @@ const ExcelJS = require("exceljs");
 const drawExcelReportHeader = require("../helpers/excelReportHeader");
 const userColumns = require("../helpers/userColumns");
 
+const { formatFileDate } = require("../../../utils/exportHelper");
+
+// Mismas columnas que muestra el PDF (pdfTable.js). Si más adelante quieren
+// que el Excel traiga "id" o "createdAt" además, basta con agregarlas aquí.
+const EXPORT_COLUMN_KEYS = ["name", "username", "email", "role", "verified", "banned", "strikes"];
+
 const excelExporter = async (users, currentUser) => {
+
+    const exportColumns = userColumns.filter(
+        column => EXPORT_COLUMN_KEYS.includes(column.key)
+    );
+
+    // Índices (1-based) de las columnas que necesitan alineación o
+    // relleno de color especial, calculados dinámicamente en vez de
+    // usar números fijos que se rompen si el orden de columnas cambia.
+    const nameColumnIndex = exportColumns.findIndex(c => c.key === "name") + 1;
+    const emailColumnIndex = exportColumns.findIndex(c => c.key === "email") + 1;
+    const roleColumnIndex = exportColumns.findIndex(c => c.key === "role") + 1;
+    const verifiedColumnIndex = exportColumns.findIndex(c => c.key === "verified") + 1;
+    const bannedColumnIndex = exportColumns.findIndex(c => c.key === "banned") + 1;
 
     const workbook = new ExcelJS.Workbook();
 
@@ -29,6 +48,7 @@ const excelExporter = async (users, currentUser) => {
         generatedBy: currentUser.name,
         totalUsers: users.length,
         stats,
+        totalColumns: exportColumns.length,
     });
 
     // ==========================================
@@ -37,7 +57,7 @@ const excelExporter = async (users, currentUser) => {
 
     const headerRow = worksheet.getRow(tableHeaderRow);
 
-    userColumns.forEach((column, index) => {
+    exportColumns.forEach((column, index) => {
 
         const cell = headerRow.getCell(index + 1);
 
@@ -54,7 +74,7 @@ const excelExporter = async (users, currentUser) => {
         },
         to: {
             row: tableHeaderRow,
-            column: userColumns.length,
+            column: exportColumns.length,
         },
     };
 
@@ -63,6 +83,7 @@ const excelExporter = async (users, currentUser) => {
         cell.font = {
             name: "Calibri",
             size: 11,
+            bold: true,
             color: {
                 argb: "FFFFFFFF",
             },
@@ -72,7 +93,7 @@ const excelExporter = async (users, currentUser) => {
             type: "pattern",
             pattern: "solid",
             fgColor: {
-                argb: "1F2937",
+                argb: "FF1F2937",
             },
         };
 
@@ -102,7 +123,7 @@ const excelExporter = async (users, currentUser) => {
 
         const row = worksheet.getRow(currentRow++);
 
-        userColumns.forEach((column, index) => {
+        exportColumns.forEach((column, index) => {
 
             row.getCell(index + 1).value = user[column.key];
 
@@ -118,9 +139,9 @@ const excelExporter = async (users, currentUser) => {
 
         if (rowNumber <= tableHeaderRow) return;
 
-        const roleCell = row.getCell(5);
-        const verificationCell = row.getCell(6);
-        const statusCell = row.getCell(7);
+        const roleCell = row.getCell(roleColumnIndex);
+        const verificationCell = row.getCell(verifiedColumnIndex);
+        const statusCell = row.getCell(bannedColumnIndex);
 
         row.height = 22;
 
@@ -136,10 +157,10 @@ const excelExporter = async (users, currentUser) => {
             let horizontal = "center";
 
             // Nombre
-            if (colNumber === 2) horizontal = "left";
+            if (colNumber === nameColumnIndex) horizontal = "left";
 
             // Correo
-            if (colNumber === 4) horizontal = "left";
+            if (colNumber === emailColumnIndex) horizontal = "left";
 
             cell.alignment = {
                 vertical: "middle",
@@ -273,7 +294,7 @@ const excelExporter = async (users, currentUser) => {
 
     return {
         buffer,
-        filename: "usuarios.xlsx",
+        filename: `usuarios_${formatFileDate(new Date())}.xlsx`,
         contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     };
 };

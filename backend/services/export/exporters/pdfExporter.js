@@ -1,19 +1,43 @@
 const PDFDocument = require("pdfkit");
+const crypto = require("crypto");
+
+const drawPdfCover = require("../helpers/pdfCover");
+const drawPdfWatermark = require("../helpers/pdfWatermark");
 const drawPdfReportHeader = require("../helpers/pdfReportHeader");
-const { formatFileDate } = require("../../../utils/exportHelper");
 const drawPdfTable = require("../helpers/pdfTable");
 
+const { formatFileDate } = require("../../../utils/exportHelper");
+
 const pdfExporter = async (users, generatedBy) => {
+
+    // ==========================================
+    // Crear documento
+    // ==========================================
+
     const doc = new PDFDocument({
         margin: 40,
+        size: "A4",
         layout: "landscape",
-        size: "legal",
         bufferPages: true,
     });
 
     const buffers = [];
 
-    doc.on("data", buffers.push.bind(buffers));
+    doc.on("data", (chunk) => buffers.push(chunk));
+
+    // ==========================================
+    // Report ID
+    // ==========================================
+
+    const reportId =
+        `USR-${formatFileDate(new Date())}-${crypto
+            .randomBytes(3)
+            .toString("hex")
+            .toUpperCase()}`;
+
+    // ==========================================
+    // Estadísticas
+    // ==========================================
 
     const stats = {
 
@@ -36,40 +60,101 @@ const pdfExporter = async (users, generatedBy) => {
         banned: users.filter(
             u => u.banned === "Baneado"
         ).length,
+
     };
 
-    drawPdfReportHeader(doc, {
+    // ==========================================
+    // PORTADA
+    // ==========================================
+
+    drawPdfWatermark(doc);
+
+    drawPdfCover(doc, {
+
         title: "Reporte General de Usuarios",
-        generatedBy: generatedBy.name,
-        totalUsers: users.length,
-        stats
+
+        generatedBy:
+            generatedBy?.name ??
+            generatedBy ??
+            "Sistema",
+
+        reportId,
+
     });
 
-    doc.moveDown(2);
+    // ==========================================
+    // NUEVA PÁGINA
+    // ==========================================
+
+    doc.addPage();
+
+    drawPdfWatermark(doc);
+
+    // ==========================================
+    // HEADER
+    // ==========================================
+
+    drawPdfReportHeader(doc, {
+
+        title: "Reporte General de Usuarios",
+
+        generatedBy:
+            generatedBy?.name ??
+            generatedBy ??
+            "Sistema",
+
+        totalUsers: users.length,
+
+        stats,
+
+    });
+
+    // ==========================================
+    // TABLA
+    // ==========================================
 
     drawPdfTable(doc, users);
-   
-    // Pie de pagina
+
+    // ==========================================
+    // FOOTER
+    // ==========================================
+
     const pages = doc.bufferedPageRange();
 
     for (let i = 0; i < pages.count; i++) {
-        doc.switchToPage(i);
-        
-        doc.fontSize(9);
 
-        doc.text(
-            `Página ${i + 1} de ${pages.count}`, 
-            0, 
-            doc.page.height - 30,
-            {
-                align: "center"
-            }
-        );
+        doc.switchToPage(i);
+        doc.save();
+
+        // Desactivar temporalmente el margen inferior para que PDFKit no interprete esta posición como
+        // overflow
+        const originalBottomMargin = doc.page.margins.bottom;
+        doc.page.margins.bottom = 0;
+
+        doc
+            .font("Helvetica")
+            .fontSize(9)
+            .fillColor("#6B7280")
+            .text(
+                `Página ${i + 1} de ${pages.count}   |   Reporte: ${reportId}`,
+                doc.page.margins.left,
+                doc.page.height - 28,
+                {
+                    width:
+                        doc.page.width - doc.page.margins.left - doc.page.margins.right,
+                    align: "center",
+                }
+            );
+
+        doc.page.margins.bottom = originalBottomMargin;
+        doc.restore();
     }
 
+    // ==========================================
+    // FINALIZAR
+    // ==========================================
     doc.end();
-
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
         doc.on("end", () => {
             resolve({
                 buffer: Buffer.concat(buffers),
@@ -77,6 +162,8 @@ const pdfExporter = async (users, generatedBy) => {
                 contentType: "application/pdf",
             });
         });
+
+        doc.on("error", reject);
     });
 };
 
