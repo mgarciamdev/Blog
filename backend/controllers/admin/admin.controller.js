@@ -212,8 +212,6 @@ const exportUsers = async (req, res) => {
             req.user
         );
 
-        console.log(req.user);
-
         res.setHeader(
             "Content-Type",
             result.contentType

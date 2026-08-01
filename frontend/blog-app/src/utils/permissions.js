@@ -20,6 +20,14 @@ export const canManageUser = (currentUser, targetUser) => {
     }
 };
 
+export const canExportDataReport = (currentUser) => {
+    if (!currentUser) return false;
+
+    return (
+        currentUser.role === "superadmin" || currentUser.role === "admin"
+    );
+};
+
 export const canCreateAdmin = (currentUser) => {
     return currentUser?.role === "superadmin";
 };
@@ -30,4 +38,8 @@ export const canDeleteUser = (currentUser, targetUser) => {
 
 export const canEditUser = (currentUser, targetUser) => {
     return canManageUser(currentUser, targetUser);
+};
+
+export const canExportReport = (currentUser) => {
+    return canExportDataReport(currentUser);
 };

@@ -6,15 +6,17 @@ import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import EditUserForm from './EditUserForm';
 import { LuEllipsisVertical, LuPencil, LuTrash2, LuSearch, LuPlus } from "react-icons/lu";
+import { CiExport } from "react-icons/ci";
 import DeleteAlertContent from '../../../components/DeleteAlertContent';
 import Modal from '../../../components/Modal';
 import DropDownSelect from '../../../components/Inputs/DropdownSelect';
 import { UserContext } from '../../../context/userContext';
 import CreateUserForm from './CreateUserForm';
-import { canManageUser, canCreateAdmin } from '../../../utils/permissions';
+import { canManageUser, canCreateAdmin, canExportReport } from '../../../utils/permissions';
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import DropdownSelect from '../../../components/Inputs/DropdownSelect';
+import ExportButton from '../../../Exports/ExportButton';
 
 const UsersDataTable = () => {
     dayjs.locale("es");
@@ -165,6 +167,10 @@ const UsersDataTable = () => {
                         Sistema de usuarios ({filteredUsers.length} usuarios)
                     </p>
                 </div>
+
+                {canExportReport(user) && (
+                    <ExportButton />
+                )}
 
                 {canCreateAdmin(user) && (
                     <button
@@ -458,7 +464,7 @@ const UsersDataTable = () => {
                                 className={`w-7 h-7 rounded-2xl transition ${currentPage === page
                                     ? "bg-slate-700 text-white"
                                     : "border hover:bg-gray-100"
-                                }`}
+                                    }`}
                             >
                                 {page}
                             </button>
