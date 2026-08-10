@@ -2,10 +2,11 @@ const User = require("../models/User");
 const Strike = require("../models/Strike");
 const Ban = require("../models/Ban");
 const mongoose = require("mongoose");
+const { INCLUDE_DELETED } = require("../utils/queryHelper");
 
 const getModerationStatsByUser = async (userId) => {
-    const user = await User.findById(userId)
-        .select("username role createdAt");
+    const user = await User.findByIdIncludingDeleted(userId)
+        .select("username role createdAt isDeleted");
 
     if (!user) {
         throw new Error("Usuario no encontrado");
@@ -125,13 +126,14 @@ const getGlobalModerationStats = async () => {
     const populatedTopStrikes = await User.populate(topUsersbyStrikes, {
         path: "_id",
         select: "username email role",
+        match: INCLUDE_DELETED,
     });
 
     const recentBans = await Ban.find()
         .sort({ createdAt: -1 })
         .limit(5)
-        .populate("user", "username")
-        .populate("bannedBy", "username");
+        .populate({ path: "user", select: "username", match: INCLUDE_DELETED })
+        .populate({ path: "bannedBy", select: "username", match: INCLUDE_DELETED });
 
     return {
         stats: {

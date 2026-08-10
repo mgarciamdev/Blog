@@ -1,6 +1,7 @@
 const Ban = require("../../models/Ban");
 const Strike = require("../../models/Strike");
 const User = require("../../models/User");
+const { INCLUDE_DELETED } = require("../../utils/queryHelper");
 
 // @desc    Timeline de moderación (bans + strike)
 // @route   GET /api/moderation/users/:userId/timeline
@@ -9,7 +10,8 @@ const getUserModerationTimeline = async (req, res) => {
     try {
         const { userId } = req.params
 
-        const user = await User.findById(userId).select("username email role");
+        const user = await User.findByIdIncludingDeleted(userId)
+            .select("username email role isDeleted");
 
         if (!user) {
             return res.status(404).json({
@@ -19,12 +21,12 @@ const getUserModerationTimeline = async (req, res) => {
 
         // Obtener bans
         const bans = await Ban.find({ user: userId })
-            .populate("bannedBy", "username role")
-            .populate("unbannedBy", "username role");
+            .populate({ path: "bannedBy", select: "username role", match: INCLUDE_DELETED })
+            .populate({ path: "unbannedBy", select: "username role", match: INCLUDE_DELETED });
 
         // Obtener strikes
         const strikes = await Strike.find({ user: userId })
-            .populate("issuedBy", "username role");
+            .populate({ path: "issuedBy", select: "username role", match: INCLUDE_DELETED });
 
         // Transformar bans a eventos
         const banEvents = bans.flatMap(ban => {

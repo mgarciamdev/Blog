@@ -184,8 +184,8 @@ const getAllAppeals = async (req, res) => {
         const total = await Appeal.countDocuments(filter);
 
         const appeals = await Appeal.find(filter)
-            .populate("user", "username email role")
-            .populate("resolvedBy", "username role")
+            .populate({ path: "user", select: "username email role", match: INCLUDE_DELETED })
+            .populate({ path: "resolvedBy", select: "username role", match: INCLUDE_DELETED })
             .populate("strike", "points status")
             .populate("ban", "type expiresAt isActive")
             .sort({ createdAt: -1 })

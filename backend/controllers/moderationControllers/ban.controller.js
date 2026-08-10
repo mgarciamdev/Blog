@@ -1,5 +1,6 @@
 const User = require("../../models/User");
 const Ban = require("../../models/Ban");
+const { INCLUDE_DELETED } = require("../../utils/queryHelper");
 
 const ROLE_HIERARCHY = {
     member: 1,
@@ -149,7 +150,8 @@ const getUserBanHistory = async (req, res) => {
 
     try {
         // Validar usuario
-        const user = await User.findById(userId).select("username email role");
+        const user = await User.findByIdIncludingDeleted(userId)
+            .select("username email role isDeleted");
 
         if (!user) {
             return res.status(404).json({
@@ -211,8 +213,8 @@ const getUserBanHistory = async (req, res) => {
 
         // Datos
         const bans = await Ban.find(filter)
-            .populate("bannedBy", "username role")
-            .populate("unbannedBy", "username role")
+            .populate({ path: "bannedBy", select: "username role", match: INCLUDE_DELETED })
+            .populate({ path: "unbannedBy", select: "username role", match: INCLUDE_DELETED })
             .sort({ createdAt: -1 })
             .skip((pageNumber - 1) * limitNumber)
             .limit(limitNumber);
@@ -258,8 +260,8 @@ const getMyBanHistory = async (req, res) => {
         const total = await Ban.countDocuments(filter);
 
         const bans = await Ban.find(filter)
-            .populate("bannedBy", "username role")
-            .populate("unbannedBy", "username role")
+            .populate({ path: "bannedBy", select: "username role", match: INCLUDE_DELETED })
+            .populate({ path: "unbannedBy", select: "username role", match: INCLUDE_DELETED })
             .sort({ createdAt: -1 })
             .skip((pageNumber - 1) * limitNumber)
             .limit(limitNumber);

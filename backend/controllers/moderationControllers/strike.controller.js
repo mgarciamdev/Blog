@@ -2,6 +2,7 @@ const Strike = require("../../models/Strike");
 const User = require("../../models/User");
 const Ban = require("../../models/Ban");
 const { calculateActiveStrikePoints } = require("../../services/moderation.service");
+const { INCLUDE_DELETED } = require("../../utils/queryHelper");
 
 const ROLE_HIERARCHY = {
     member: 1,
@@ -102,7 +103,7 @@ const getUserStrikes = async (req, res) => {
         const { userId } = req.params;
 
         const strikes = await Strike.find({ user: userId })
-            .populate("issuedBy", "username role")
+            .populate({ path: "issuedBy", select: "username role", match: INCLUDE_DELETED })
             .sort({ createdAt: -1 });
 
         res.json(strikes);
@@ -151,6 +152,11 @@ const removeStrike = async (req, res) => {
             await User.findByIdAndUpdate(strike.user, {
                 isBanned: false
             });
+
+            await User.updateOne(
+                { _id: strike.user, isDeleted: { $in: [true, false] } },
+                { isBanned: false }
+            );
         }
 
         res.json({
@@ -171,10 +177,10 @@ const removeStrike = async (req, res) => {
 // @access  Private (member)
 const getMyStrikes = async (req, res) => {
     try {
-        const strikes = await Strike.find({
-            user: req.user._id
-        })
-            .populate("issuedBy", "username role")
+        const { userId } = req.params;
+
+        const strikes = await Strike.find({ user: userId })
+            .populate({ path: "issuedBy", select: "username role", match: INCLUDE_DELETED })
             .sort({ createdAt: -1 });
 
         res.json(strikes);

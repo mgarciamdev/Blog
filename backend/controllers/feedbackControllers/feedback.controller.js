@@ -1,6 +1,7 @@
 const Feedback = require("../../models/Feedback");
 const User = require("../../models/User");
 const { sendFeedbackResponseEmail } = require("../../utils/emailHelper");
+const { INCLUDE_DELETED } = require("../../utils/queryHelper");
 
 // @desc    Crear un nuevo feedback por parte del usuario
 // @route   POST /api/feedback
@@ -53,8 +54,8 @@ const getReceivedFeedbacks = async (req, res) => {
         if (status) query.status = status;
 
         const feedbacks = await Feedback.find(query)
-            .populate("sender", "username name email profileImageUrl")
-            .populate("response.responder", "name email profileImageUrl")
+            .populate({ path: "sender", select: "username name email profileImageUrl", match: INCLUDE_DELETED })
+            .populate({ path: "response.responder", select: "name email profileImageUrl", match: INCLUDE_DELETED })
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limitNumber)
@@ -122,7 +123,7 @@ const respondFeedback = async (req, res) => {
         }
 
         const feedback = await Feedback.findById(req.params.id)
-            .populate("sender", "email name username profileImageUrl");
+            .populate({ path: "sender", select: "email name username profileImageUrl isDeleted", match: INCLUDE_DELETED });
 
         if (!feedback) {
             return res.status(404).json({
@@ -149,15 +150,17 @@ const respondFeedback = async (req, res) => {
 
         await feedback.save();
 
-        // enviar email
-        try {
-            await sendFeedbackResponseEmail(
-                feedback.sender,
-                feedback,
-                content
-            );
-        } catch (emailError) {
-            console.error("Error enviando email:", emailError.message);
+        // Solo enviamos email si el usuario sigue activo
+        if (feedback.sender && !feedback.sender.isDeleted) { // <-- cambio
+            try {
+                await sendFeedbackResponseEmail(
+                    feedback.sender,
+                    feedback,
+                    content
+                );
+            } catch (emailError) {
+                console.error("Error enviando email:", emailError.message);
+            }
         }
 
         res.json({
@@ -245,7 +248,7 @@ const getFeedbackResponse = async (req, res) => {
         }
 
         const feedbacks = await Feedback.find(query)
-            .populate("response.responder", "name email profileImageUrl")
+            .populate({ path: "response.responder", select: "name email profileImageUrl", match: INCLUDE_DELETED })
             .sort({ createdAt: -1 });
 
         res.json({
@@ -256,8 +259,6 @@ const getFeedbackResponse = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             message: "Error al obtener feedbacks del usuario",
-            responded: feedbacks.filter(f => f.status === "responded").length,
-            pending: feedbacks.filter(f => f.status === "pending").length,
             error: error.message
         });
     }
