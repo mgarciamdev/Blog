@@ -74,7 +74,7 @@ export const API_PATHS = {
     USUARIOS: {
         PUBLICOS: {
             VERIFICAR_USERNAME: "/api/users/check", // Verifica si el nombre de usuario esta o no esta disponible
-            OBTENER_PERFIL_PUBLICO: (id) => `/api/users/${id}`, // Obtenemos el perfil publico del usuario(s)
+            // OBTENER_PERFIL_PUBLICO: (id) => `/api/users/${id}`, // Obtenemos el perfil publico del usuario(s)
         },
 
         PRIVADOS: {
