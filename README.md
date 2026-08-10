@@ -69,6 +69,7 @@ backend/
 ├── routes/
 ├── scripts/
 ├── services/
+├── tests/
 ├── uploads/
 └── utils/
 server.js
@@ -333,6 +334,19 @@ npm run dev
 ## 🧪 Testing
 
 - Se recomienda usar Postman para probar los endpoints.
+
+### Script de diagnóstico manual (cuentas de usuario)
+
+No es una prueba automatizada (el proyecto aún no tiene Jest/Mocha configurado) — es una herramienta de inspección rápida para depurar el estado real de una cuenta en la base de datos, útil sobre todo para validar el flujo de soft delete/reactivación.
+
+```bash
+node tests/manual/check-user-account.js <email> [password]
+```
+
+Muestra:
+- Si el usuario es encontrado respetando el hook de `isDeleted` (lo que vería un login real)
+- El documento crudo (`isDeleted`, `deletedAt`, `isVerified`, `isBanned`)
+- Si la contraseña proporcionada coincide con el hash guardado (opcional)
 
 ---
 
