@@ -31,6 +31,7 @@ Backend completo para una plataforma de blogs con sistema de moderación avanzad
 - 📊 Dashboard dinámico con estadísticas
 - 📤 Subida de archivos (imágenes, PDFs) con validación
 - 🛡️ Middleware de seguridad (validación, control de baneos, etc.)
+- 🗑️ Eliminación de cuentas con Soft Delete y reactivación dentro de un periodo de gracia
 
 ---
 ## 🧠 Arquitectura
@@ -99,6 +100,20 @@ Incluye:
 
 ---
 
+## 🗑️ Eliminación de cuentas (Soft Delete)
+
+Las cuentas de usuario nunca se eliminan físicamente al momento de la baja. En su lugar:
+
+- Se marcan como `isDeleted: true` y se registra `deletedAt`
+- El email y username quedan disponibles para un nuevo registro (índices únicos parciales)
+- El usuario queda excluido automáticamente de logins, perfiles públicos y consultas generales
+- Los paneles de moderación y auditoría (strikes, bans, apelaciones, feedback) siguen mostrando el historial de cuentas eliminadas
+- Los posts y comentarios de una cuenta eliminada se conservan, mostrando el autor como "Usuario eliminado"
+
+**Reactivación:** dentro de un periodo de gracia de 30 días, el usuario puede reactivar su cuenta con `POST /api/auth/reactivate` usando su email y contraseña. Pasado ese periodo, la cuenta queda sujeta a purga definitiva.
+
+---
+
 ## 🤖 IA (Inteligencia Artificial)
 
 Integración con Google Gemini para:
@@ -132,6 +147,14 @@ Con validación de:
 - POST `/api/auth/refresh`
 - POST `/api/auth/retry-verify`
 - POST `/api/auth/password/recover`
+- POST `/api/auth/reactivate`
+
+### Users
+- GET `/api/users/profile`
+- PUT `/api/users/profile`
+- PUT `/api/users/username`
+- PUT `/api/users/change-password`
+- DELETE `/api/users/me` *(soft delete)*
 
 ### Posts
 - GET `/api/posts`
@@ -227,6 +250,17 @@ npm run cli reset-superadmin
 - Elimina el usuario con rol ``superadmin`` actual
 - Crea uno nuevo desde cero
 
+Purgar cuentas eliminadas
+
+```bash
+npm run cli purge-expired-accounts -- --dry-run   # previsualiza sin borrar nada
+npm run cli purge-expired-accounts                # ejecuta (pide confirmación escrita)
+```
+- Elimina físicamente las cuentas con ``isDeleted: true`` cuyo periodo de gracia (30 días) ya expiró
+- Limpia también sus ``SavedPost`` y ``CommentReaction`` asociados
+- Conserva el historial de moderación (strikes, bans, apelaciones, feedback) como auditoría
+- Siempre muestra un preview antes de pedir confirmación
+
 ### ⚡ Uso avanzado
 
 ```bash
@@ -244,6 +278,26 @@ npx blog-cli create-superadmin
 - Ejecutar solo en entornos seguros
 - No exponer como endpoint HTTP
 
+### 🗑️ Migración de Soft Delete
+
+Script de una sola ejecución (fuera de la CLI, se corre una única vez al desplegar el feature) para asegurar que los usuarios existentes tengan los campos `isDeleted`/`deletedAt` y sincronizar los índices únicos parciales.
+
+```bash
+# Verifica qué se actualizaría, sin aplicar cambios
+node scripts/migrate-soft-delete-fields.js --dry-run
+
+# Aplica la migración
+node scripts/migrate-soft-delete-fields.js
+```
+
+```bash
+# Verifica qué se actualizaría, sin aplicar cambios
+node scripts/migrate-soft-delete-fields.js --dry-run
+
+# Aplica la migración
+node scripts/migrate-soft-delete-fields.js
+```
+
 ### 👑 Gestión de SuperAdmin
 
 ### 🆕 Crear superadmin (primera instalación)
@@ -257,6 +311,14 @@ npm run cli create-superadmin
 ```bash
 npm run cli reset-superadmin
 ```
+
+### 🗑️ Purgar cuentas eliminadas
+
+```bash
+npm run cli purge-expired-accounts
+```
+
+> También corre automáticamente todos los días a las 3:00 AM mediante un cron job (`jobs/purgeAccounts.job.js`), registrado al iniciar el servidor.
 
 ---
 
