@@ -39,33 +39,34 @@ const migrate = async () => {
 
             await cerrarConexion();
             return;
-
-            console.log("\nAplicando migración...");
-
-            const result = await User.updateMany(
-                filter,
-                { $set: { isDeleted: false, deletedAt: null } }
-            );
-
-            console.log(`Documentos coincidentes: ${result.matchedCount}`);
-            console.log(`Documentos modificados: ${result.modifiedCount}`);
-
-            // Verificación post-migración
-            const remaining = await User.countDocuments({ isDeleted: { $exists: false } });
-
-            if (remaining > 0) {
-                console.warn(`\n⚠ Advertencia: quedan ${remaining} usuarios sin el campo isDeleted.`);
-            } else {
-                console.log("\n✓ Todos los usuarios tienen el campo isDeleted correctamente.");
-            }
-
-            // Sincronizamos los índices (crea el índice parcial si aún no existe)
-            console.log("\nSincronizando índices...");
-            await User.syncIndexes();
-            console.log("✓ Índices sincronizados.");
-
-            await cerrarConexion();
         }
+
+        console.log("\nAplicando migración...");
+
+        const result = await User.updateMany(
+            filter,
+            { $set: { isDeleted: false, deletedAt: null } }
+        );
+
+        console.log(`Documentos coincidentes: ${result.matchedCount}`);
+        console.log(`Documentos modificados: ${result.modifiedCount}`);
+
+        // Verificación post-migración
+        const remaining = await User.countDocuments({ isDeleted: { $exists: false } });
+
+        if (remaining > 0) {
+            console.warn(`\n⚠ Advertencia: quedan ${remaining} usuarios sin el campo isDeleted.`);
+        } else {
+            console.log("\n✓ Todos los usuarios tienen el campo isDeleted correctamente.");
+        }
+
+        // Sincronizamos los índices (crea el índice parcial si aún no existe)
+        console.log("\nSincronizando índices...");
+        await User.syncIndexes();
+        console.log("Índices sincronizados.");
+
+        await cerrarConexion();
+
     } catch (error) {
         console.error("\nError durante la migración:", error.message);
         await mongoose.disconnect();
