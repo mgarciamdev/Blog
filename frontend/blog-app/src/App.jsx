@@ -15,6 +15,7 @@ import ForgetPassword from "./pages/Auth/ForgetPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import Verify from "./pages/Auth/Verify";
 import Users from "./pages/Admin/Users";
+import Profile from "./pages/Profile/Profile";
 
 const App = () => {
   return (
@@ -53,7 +54,11 @@ const App = () => {
           <Route element={<PrivateRoute allowedRoles={["member", "admin", "superadmin"]} />}>
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>
-          {/* Rutas para inicio de Sesión o Creación de Cuenta */}
+          
+          {/* PROFILE */}
+          <Route element={<PrivateRoute allowedRoles={["member", "admin", "superadmin"]} />}>
+            <Route path="/profile" element={<Profile />} />
+          </Route>
 
         </Routes>
       </Router>
