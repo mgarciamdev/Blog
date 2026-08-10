@@ -34,6 +34,8 @@ const UserSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
+// --- Índices ---
+// Únicos solo entre usuarios no eliminados, para poder liberar el email/username cuando una cuenta se marca como eliminada.
 UserSchema.index(
     { email: 1 },
     { unique: true, partialFilterExpression: { isDeleted: false } }
@@ -44,19 +46,21 @@ UserSchema.index(
     { unique: true, partialFilterExpression: { isDeleted: false } }
 );
 
-function excludeDeleted(next) {
-    if (!this.getQuery().hasOwnProperty("idDeleted")) {
+// --- Middleware ---
+// Excluye automáticamente usuarios eliminados de cualquier consulta find/findOne/findById/etc, a menos que la query ya especifique isDeleted explícitamente.
+UserSchema.pre(/^find/, function () {
+    if (!this.getQuery().hasOwnProperty("isDeleted")) {
         this.where({ isDeleted: false });
     }
-    next();
-};
+});
 
-UserSchema.pre(/^find/, excludeDeleted);
-
+// --- Statics ---
+// Busca por _id ignorando el filtro de eliminados (auditoría, moderación)
 UserSchema.statics.findByIdIncludingDeleted = function (id) {
     return this.findOne({ _id: id, isDeleted: { $in: [true, false] } });
 };
 
+// Busca con cualquier filtro ignorando el filtro de eliminados (login, reactivación)
 UserSchema.statics.findOneIncludingDeleted = function (filter) {
     return this.findOne({ ...filter, isDeleted: { $in: [true, false] } });
 };
