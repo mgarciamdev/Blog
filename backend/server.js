@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db.config");
+const { schedulePurgeJob } = require("./jobs/purgeAccounts.job");
 
 const authRoutes = require("./routes/auth.routes");
 const moderationRoutes = require("./routes/moderation.routes");
@@ -28,9 +29,6 @@ app.use(
     })
 );
 
-// Conexion a la base de datos
-connectDB();
-
 // Middleware
 app.use(express.json());
 
@@ -52,4 +50,15 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Inicializamos el Servidor
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+const startServer = async () => {
+
+    await connectDB();
+
+    schedulePurgeJob();
+
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+};
+
+startServer();
