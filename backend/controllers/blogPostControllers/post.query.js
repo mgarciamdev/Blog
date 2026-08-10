@@ -1,4 +1,5 @@
 const BlogPost = require("../../models/BlogPost");
+const { formatAuthor } = require("../../services/post.service");
 
 // @desc    Get posts by tag
 // @route   GET /api/posts/tag/:tag
@@ -31,7 +32,7 @@ const getPostByTag = async (req, res) => {
                 slug: p.slug,
                 coverImageUrl: p.coverImageUrl,
                 tags: p.tags,
-                author: p.author,
+                author: formatAuthor(p.author),
                 createdAt: p.createdAt,
             })),
             pagination: {
@@ -84,11 +85,11 @@ const searchPosts = async (req, res) => {
         res.json({
             posts: posts.map(p => ({
                 id: p._id,
-                titel: p.title,
+                title: p.title,
                 slug: p.slug,
                 coverImageUrl: p.coverImageUrl,
                 tags: p.tags,
-                author: p.author,
+                author: formatAuthor(p.author),
                 createdAt: p.createdAt,
             })),
             pagination: {
@@ -131,7 +132,7 @@ const getTopPosts = async (req, res) => {
                 title: p.title,
                 slug: p.slug,
                 coverImageUrl: p.coverImageUrl,
-                author: p.author,
+                author: formatAuthor(p.author),
                 likes: p.likes,
                 views: p.views,
             })),

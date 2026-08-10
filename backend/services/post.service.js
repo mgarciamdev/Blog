@@ -84,8 +84,19 @@ const generateUniqueSlug = async (title, postId = null) => {
     }
 };
 
+const formatAuthor = (author) => {
+    if (author) return author;
+
+    return {
+        name: "Usuario eliminado",
+        username: null,
+        profileImageUrl: null,
+    };
+};
+
 module.exports = {
     handleReaction,
     incrementPostView,
-    generateUniqueSlug
+    generateUniqueSlug,
+    formatAuthor
 };

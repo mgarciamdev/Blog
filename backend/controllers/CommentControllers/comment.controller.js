@@ -2,6 +2,7 @@ const Comment = require("../../models/Comment");
 const BlogPost = require("../../models/BlogPost");
 const { deleteCommentRecursive } = require("../../services/comment.service");
 const CommentReaction = require("../../models/CommentReaction");
+const { formatAuthor } = require("../../services/post.service");
 
 // @desc    Add a comment to a blog post
 // @route   POST /api/comments/:postId
@@ -53,9 +54,12 @@ const addComment = async (req, res) => {
 
         await comment.populate("author", "name profileImageUrl");
 
+        const commentObj = comment.toObject();
+        commentObj.author = formatAuthor(commentObj.author); // <-- cambio
+
         res.status(201).json({
             message: "Comentario creado",
-            comment,
+            comment: commentObj,
         });
 
     } catch (error) {
@@ -76,6 +80,10 @@ const getAllComments = async (req, res) => {
             .populate("post", "title slug coverImageUrl")
             .sort({ createdAt: 1 })
             .lean();
+
+        comments.forEach(comment => {
+            comment.author = formatAuthor(comment.author);
+        });
 
         // IDs
         const commentIds = comments.map(c => c._id);
@@ -177,6 +185,10 @@ const getCommentsByPost = async (req, res) => {
             .populate("author", "name profileImageUrl")
             .sort({ createdAt: 1 })
             .lean();
+
+        comments.forEach(comment => {
+            comment.author = formatAuthor(comment.author);
+        });
 
         // Id de comments
         const commentsIds = comments.map(c => c._id);
@@ -351,9 +363,12 @@ const updateComment = async (req, res) => {
 
         await comment.populate("author", "name profileImageUrl");
 
+        const commentObj = comment.toObject();
+        commentObj.author = formatAuthor(commentObj.author);
+
         res.json({
             message: "Comentario actualizado",
-            comment,
+            comment: commentObj,
         });
 
     } catch (error) {

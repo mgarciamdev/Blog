@@ -1,6 +1,6 @@
 const BlogPost = require("../../models/BlogPost");
 const SavedPost = require("../../models/SavedPost");
-const { generateUniqueSlug } = require("../../services/post.service");
+const { generateUniqueSlug, formatAuthor } = require("../../services/post.service");
 const Comment = require("../../models/Comment");
 const CommentReaction = require("../../models/CommentReaction");
 
@@ -162,26 +162,16 @@ const deletePost = async (req, res) => {
             });
         }
 
-        const comments = await Comment.find({
-            post: post._id
-        }).select("_id");
+        const comments = await Comment.find({ post: post._id }).select("_id");
 
         const commentIds = comments.map(comment => comment._id);
 
         if (commentIds.length > 0) {
-            await CommentReaction.deleteMany({
-                comment: { $in: commentIds }
-            });
+            await CommentReaction.deleteMany({ comment: { $in: commentIds } });
         }
 
-        await Comment.deleteMany({
-            post: post._id
-        });
-
-        await SavedPost.deleteMany({
-            post: post._id
-        });
-
+        await Comment.deleteMany({ post: post._id });
+        await SavedPost.deleteMany({ post: post._id });
         await post.deleteOne();
 
         res.json({
@@ -270,7 +260,7 @@ const getAllPosts = async (req, res) => {
             slug: post.slug,
             coverImageUrl: post.coverImageUrl,
             tags: post.tags,
-            author: post.author,
+            author: formatAuthor(post.author),
             isDraft: post.isDraft,
             views: post.views,
             likes: post.likes,
@@ -354,7 +344,7 @@ const getPostBySlug = async (req, res) => {
                 content: post.content,
                 coverImageUrl: post.coverImageUrl,
                 tags: post.tags,
-                author: post.author,
+                author: formatAuthor(post.author),
                 isDraft: post.isDraft,
                 generatedByAI: post.generatedByAI,
                 views: post.views,

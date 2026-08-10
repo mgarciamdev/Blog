@@ -1,5 +1,6 @@
 const SavedPost = require("../../models/SavedPost");
 const BlogPost = require("../../models/BlogPost");
+const { formatAuthor } = require("../../services/post.service");
 
 // @desc    Save a post
 // @route   PUT /api/posts/:id/save
@@ -103,11 +104,19 @@ const getSavedPosts = async (req, res) => {
                 },
             });
 
+        const formattedSavedPosts = savedPosts.map(sp => {
+            const obj = sp.toObject();
+            if (obj.post) {
+                obj.post.author = formatAuthor(obj.post.author);
+            }
+            return obj;
+        });
+
         res.json({
             total,
             page: pageNumber,
             pages: Math.ceil(total / limitNumber),
-            savedPosts,
+            savedPosts: formattedSavedPosts,
         });
 
     } catch (error) {
