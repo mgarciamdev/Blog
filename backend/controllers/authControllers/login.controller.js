@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const isUserBanned = require("../../utils/isUserBanned");
 const { generateAccessToken, generateRefreshToken } = require("../../utils/generateToken");
 
-// @desc    Login User (only members role)
+// @desc    Login Users
 // @route   POST /api/auth/login
 // @access  Public 
 const loginUser = async (req, res) => {
@@ -18,14 +18,28 @@ const loginUser = async (req, res) => {
 
         const user = await User.findOne({ email: normalizedEmail });
 
+        if (!user) {
+            // revisamos si existe una cuenta ELIMINADA con este email
+            const deletedUser = await User.findOneIncludingDeleted({ email: normalizedEmail });
+
+            if (deletedUser?.isDeleted) {
+                const isMatch = await bcrypt.compare(password, deletedUser.password);
+
+                if (isMatch) {
+                    return res.status(403).json({
+                        message: "Esta cuenta fue eliminada. Puedes reactivarla.",
+                        accountDeleted: true,
+                    });
+                }
+            }
+
+            return res.status(400).json({ message: "Email o contraseña invalidos" });
+        }
+
         if (loginType === "admin" && user.role === "member") {
             return res.status(403).json({
                 message: "No tienes acceso como admin"
             });
-        }
-
-        if (!user) {
-            return res.status(400).json({ message: "Email o contraseña invalidos" });
         }
 
         if (!user.isVerified) {

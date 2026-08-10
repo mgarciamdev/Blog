@@ -287,25 +287,23 @@ const updateUsername = async (req, res) => {
 const deleteMyAccount = async (req, res) => {
     try {
         const { password } = req.body;
-
         const user = await User.findById(req.user._id);
 
         if (!user) {
-            return res.status(404).json({
-                message: "Usuario no encontrado"
-            });
+            return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
         // Confirmamos identidad
         const isMatch = await bcrypt.compare(password, user.password);
-
         if (!isMatch) {
-            return res.status(400).json({
-                message: "Contraseña incorrecta"
-            });
+            return res.status(400).json({ message: "Contraseña incorrecta" });
         }
 
-        await user.deleteOne();
+        user.isDeleted = true;
+        user.deletedAt = new Date();
+        user.refreshToken = null; // invalida sesiones activas
+        
+        await user.save();
 
         res.json({
             message: "Cuenta eliminada correctamente"

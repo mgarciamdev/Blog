@@ -5,6 +5,7 @@ module.exports = { // Ejemplo de Forma Spread
     ...require("./register.controller"),
     ...require("./password.controller"),
     ...require("./verify.controller"),
+    ...require("./reactivate.controller"),
 };
 
 // Ejemplo de Forma explicita 

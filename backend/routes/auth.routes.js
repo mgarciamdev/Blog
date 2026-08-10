@@ -1,5 +1,5 @@
 const express = require("express");
-const { loginUser, refreshToken, logoutUser, registerUser, resetPassword, recoverPassword, verifyChangeToken, verifyEmail, retryVerify } = require("../controllers/authControllers/index");
+const { loginUser, refreshToken, logoutUser, registerUser, resetPassword, recoverPassword, verifyChangeToken, verifyEmail, retryVerify, reactivateAccount } = require("../controllers/authControllers/index");
 const { protect } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
@@ -21,6 +21,9 @@ router.post("/password/reset-password/:token", resetPassword);
 
 // Refresh token
 router.post("/refresh", refreshToken);
+
+// Reactivación de cuenta eliminada
+router.post("/reactivate", reactivateAccount);
 
 //Logout
 router.post("/logout", protect, logoutUser);

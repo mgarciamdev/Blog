@@ -50,9 +50,10 @@ router.get(
     checkUsername
 );
 
-router.get(
-    "/:id",
-    getUserById
-);
+// Comentado: ya no se usan perfiles públicos, solo el usuario ve su propio perfil
+// router.get(
+//     "/:id",
+//     getUserById
+// );
 
 module.exports = router;
