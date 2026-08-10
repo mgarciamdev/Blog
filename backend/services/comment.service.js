@@ -10,6 +10,9 @@ const deleteCommentRecursive = async (commentId) => {
         await deleteCommentRecursive(reply._id);
     }
 
+    // Eliminar reacciones del comentario actual
+    await CommentReaction.deleteMany({ comment: commentId });
+
     //Eliminar el actual
     await Comment.deleteOne({ _id: commentId });
 };
