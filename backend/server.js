@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db.config");
 const { schedulePurgeJob } = require("./jobs/purgeAccounts.job");
+const { globalLimiter } = require("./middlewares/rateLimiter");
 
 const authRoutes = require("./routes/auth.routes");
 const moderationRoutes = require("./routes/moderation.routes");
@@ -19,6 +20,8 @@ const feedbackRoutes = require("./routes/feedback.routes");
 
 const app = express();
 
+app.set("trust proxy", 1); // necesario en Render
+
 // Middleware para manejar CORS
 app.use(
     cors({
@@ -31,6 +34,7 @@ app.use(
 
 // Middleware
 app.use(express.json());
+app.use(globalLimiter);
 
 // Rutas
 app.use("/api/auth", authRoutes);
