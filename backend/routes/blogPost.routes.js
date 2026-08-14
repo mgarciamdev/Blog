@@ -21,6 +21,7 @@ const {
 const { protect } = require("../middlewares/authMiddleware");
 const { authorize } = require("../middlewares/authorizeMiddleware");
 const { blockIfBanned } = require("../middlewares/blockIfBanned");
+const { reactionLimiter } = require("../middlewares/rateLimiter");
 
 /**
  * POST CORE
@@ -84,6 +85,7 @@ router.post(
     "/:id/likes",
     protect,
     blockIfBanned,
+    reactionLimiter,
     likePost
 );
 
@@ -91,6 +93,7 @@ router.post(
     "/:id/dislikes",
     protect,
     blockIfBanned,
+    reactionLimiter,
     dislikePost
 );
 
@@ -101,6 +104,7 @@ router.post(
     "/:id/save",
     protect,
     blockIfBanned,
+    reactionLimiter,
     savePost
 );
 

@@ -13,11 +13,12 @@ const {
 const { protect } = require("../middlewares/authMiddleware");
 const { authorize } = require("../middlewares/authorizeMiddleware");
 const { blockIfBanned } = require("../middlewares/blockIfBanned");
+const { createContentLimiter, reactionLimiter } = require("../middlewares/rateLimiter");
 
 /**
  * Crear comentario
  */
-router.post("/:postId", protect, blockIfBanned, addComment);
+router.post("/:postId", protect, blockIfBanned, createContentLimiter, addComment);
 
 /**
  * Obtener todos los comentarios (ADMIN)
@@ -42,6 +43,6 @@ router.delete("/:commentId", protect, blockIfBanned, deleteComment);
 /**
  * Reacciones (Like / Dislike)
  */
-router.post("/:commentId/reaction", protect, blockIfBanned, reactToComment);
+router.post("/:commentId/reaction", protect, blockIfBanned, reactionLimiter, reactToComment);
 
 module.exports = router;

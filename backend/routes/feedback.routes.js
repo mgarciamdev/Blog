@@ -13,6 +13,7 @@ const {
 
 const { protect } = require("../middlewares/authMiddleware");
 const { authorize } = require("../middlewares/authorizeMiddleware");
+const { createContentLimiter } = require("../middlewares/rateLimiter");
 
 /**
  *  MEMBER
@@ -20,6 +21,7 @@ const { authorize } = require("../middlewares/authorizeMiddleware");
 router.post(
     "/",
     protect,
+    createContentLimiter,
     createFeedback
 );
 
