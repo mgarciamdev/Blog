@@ -1,13 +1,18 @@
-import { createContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axiosInstance from '../utils/axiosInstance';
 import { API_PATHS } from '../utils/apiPaths';
-
-export const UserContext = createContext();
+import { UserContext } from './userContext';
 
 const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [openAuthForm, setOpenAuthForm] = useState(false);
+
+  const clearUser = () => {
+    setUser(null);
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -23,12 +28,12 @@ const UserProvider = ({ children }) => {
           API_PATHS.USUARIOS.PRIVADOS.OBTENER_PERFIL
         );
 
-        setUser(response.data);
+        setUser(response.data.user);
 
       } catch (error) {
         console.error("Usuario no autenticado", error);
 
-        clearUser(false);
+        clearUser();
 
       } finally {
         setLoading(false);
@@ -52,11 +57,8 @@ const UserProvider = ({ children }) => {
     );
   };
 
-  const clearUser = () => {
-    setUser(null);
-
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+  const updateUserProfile = (userData) => {
+    setUser(userData.user);
   };
 
   return (
@@ -66,6 +68,7 @@ const UserProvider = ({ children }) => {
         loading,
         setUser,
         updateUser,
+        updateUserProfile,
         clearUser,
         openAuthForm,
         setOpenAuthForm,
