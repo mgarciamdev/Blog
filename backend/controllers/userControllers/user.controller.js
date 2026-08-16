@@ -2,6 +2,10 @@ const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 const { sendPasswordChangeEmail } = require("../../utils/emailHelper");
 
+const SAFE_USER_FIELDS = "-password -refreshToken -verificationToken -vfTokenExpires -resetPasswordToken -resetPasswordExpires -isDeleted -deletedAt -__v";
+
+const getSanatizedUser = (userId) => User.findById(userId).select(SAFE_USER_FIELDS);
+
 // @desc    Get my profile
 // @route   GET /api/users/profile
 // @access  Private
@@ -9,8 +13,7 @@ const getMyProfile = async (req, res) => {
     try {
         const userId = req.user._id;
 
-        const user = await User.findById(userId)
-            .select("-password -refreshToken");
+        const user = await getSanatizedUser(userId);
 
         if (!user) {
             return res.status(404).json({
@@ -66,21 +69,18 @@ const updateProfile = async (req, res) => {
             });
         }
 
-        // ✏️ actualización
+        // actualización
         if (name) user.name = name;
         if (bio) user.bio = bio;
         if (profileImageUrl) user.profileImageUrl = profileImageUrl;
 
         await user.save();
 
+        const updateUser = await getSanatizedUser(user._id);
+
         res.json({
             message: "Perfil actualizado",
-            user: {
-                _id: user._id,
-                name: user.name,
-                bio: user.bio,
-                profileImageUrl: user.profileImageUrl
-            }
+            user: updateUser
         });
 
     } catch (error) {
@@ -91,32 +91,32 @@ const updateProfile = async (req, res) => {
     }
 };
 
-// @desc    Get user public profile by id
-// @route   GET /api/users/:id
-// @access  Public
-const getUserById = async (req, res) => {
-    try {
-        const { id } = req.params;
+// // @desc    Get user public profile by id
+// // @route   GET /api/users/:id
+// // @access  Public
+// const getUserById = async (req, res) => {
+//     try {
+//         const { id } = req.params;
 
-        const user = await User.findById(id)
-            .select("username name profileImageUrl bio createdAt");
+//         const user = await User.findById(id)
+//             .select("username name profileImageUrl bio createdAt");
 
-        if (!user) {
-            return res.status(404).json({
-                message: "Usuario no encontrado"
-            });
-        }
+//         if (!user) {
+//             return res.status(404).json({
+//                 message: "Usuario no encontrado"
+//             });
+//         }
 
-        res.json({
-            user
-        });
+//         res.json({
+//             user
+//         });
 
-    } catch (error) {
-        res.status(500).json({
-            message: "Error al obtener usuario"
-        });
-    }
-};
+//     } catch (error) {
+//         res.status(500).json({
+//             message: "Error al obtener usuario"
+//         });
+//     }
+// };
 
 // @desc    Actualizar contraseña
 // @route   PUT /api/users/change-password
@@ -144,7 +144,7 @@ const changePassword = async (req, res) => {
         const isMatch = await bcrypt.compare(currentPassword, user.password);
 
         if (!isMatch) {
-            return res.status(404).json({
+            return res.status(400).json({
                 message: "Contraseña actual incorrecta"
             });
         }
@@ -265,9 +265,11 @@ const updateUsername = async (req, res) => {
 
         await user.save();
 
+        const updatedUser = await getSanatizedUser(user._id);
+
         res.json({
             message: "Username actualizado correctamente",
-            username: user.username,
+            username: updatedUser,
             nextAvailableChange: new Date(
                 now.getTime() + DAYS_LIMIT * 24 * 60 * 60 * 1000
             )
@@ -372,7 +374,7 @@ const checkUsername = async (req, res) => {
 module.exports = {
     getMyProfile,
     updateProfile,
-    getUserById,
+    // getUserById,
     changePassword,
     updateUsername,
     deleteMyAccount,
