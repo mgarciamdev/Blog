@@ -21,8 +21,8 @@ const ask = (question) => {
 const validatePassword = (password) => {
     const errors = [];
 
-    if (password.length < 10)
-        errors.push("Debe contener al menos 10 caracteres.");
+    if (password.length < 12)
+        errors.push("Debe contener al menos 12 caracteres.");
     if (!/[A-Z]/.test(password))
         errors.push("Debe contener al menos 1 letra mayúscula.");
     if (!/[a-z]/.test(password))

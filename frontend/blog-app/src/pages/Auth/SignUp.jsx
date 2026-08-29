@@ -93,7 +93,7 @@ const SignUp = () => {
         throw new Error("Por favor ingrese un correo electronico valido");
       }
 
-      if (password.length > 12) {
+      if (password.length < 12) {
         throw new Error("La contraseña debe tener mínimo 12 caracteres");
       }
 

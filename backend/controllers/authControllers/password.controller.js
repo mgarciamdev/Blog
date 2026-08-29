@@ -12,6 +12,12 @@ const resetPassword = async (req, res) => {
     const { password } = req.body;
 
     try {
+        if (!password || password.length < 12) {
+            return res.status(400).json({
+                message: "La contraseña debe tener al menos 12 caracteres"
+            });
+        }
+
         const hashedToken = crypto
             .createHash("sha256")
             .update(token)

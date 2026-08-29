@@ -159,9 +159,9 @@ const changePassword = async (req, res) => {
         }
 
         // logintud de contraseña
-        if (newPassword.length < 8) {
+        if (newPassword.length < 12) {
             return res.status(400).json({
-                message: "La contraseña debe tener al menos 8 caracteres"
+                message: "La contraseña debe tener al menos 12 caracteres"
             });
         }
 
@@ -269,7 +269,7 @@ const updateUsername = async (req, res) => {
 
         res.json({
             message: "Username actualizado correctamente",
-            username: updatedUser,
+            user: updatedUser,
             nextAvailableChange: new Date(
                 now.getTime() + DAYS_LIMIT * 24 * 60 * 60 * 1000
             )

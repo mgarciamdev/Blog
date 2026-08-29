@@ -26,6 +26,12 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ message: "La contraseña es obligatoria" });
         }
 
+        if (password.length < 12) {
+            return res.status(400).json({
+                message: "La contraseña debe tener al menos 12 caracteres"
+            });
+        }
+
         // Verificamos si el email ya existe
         const userExists = await User.findOne({ email: normalizedEmail });
         if (userExists) {
