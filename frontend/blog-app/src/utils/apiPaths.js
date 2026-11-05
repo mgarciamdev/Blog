@@ -24,6 +24,7 @@ export const API_PATHS = {
         RECUPERAR_PASSWORD: "/api/auth/password/recover", // Se envia un correo con un link y token para recuperar la contraseña
         VERIFICAR_TOKEN_DE_RECUPERACION: (token) => `/api/auth/password/recover/${token}`, // Verifica el token enviado a email y redirecciona a frontend (no se si dejarlo  dado que son para redireccion)
         RESETEAR_PASSWORD: (token) => `/api/auth/password/reset-password/${token}`, // Con el token obtenido nos permite cambiar la contraseña, al cambiarla se envia un correo de confirmación de cambio.
+        REACTIVAR_CUENTA: "/api/auth/reactivate", // Reactiva una cuenta eliminada (email + contraseña) dentro de los 30 días de gracia.
     },
 
     POSTS: {

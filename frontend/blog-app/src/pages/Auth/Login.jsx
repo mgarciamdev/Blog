@@ -16,12 +16,15 @@ const Login = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const [accountDeleted, setAccountDeleted] = useState(false);
+
   const { updateUser } = useContext(UserContext);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    e?.preventDefault();
     setError(null);
+    setAccountDeleted(false);
     setLoading(true);
 
     const toastId = toast.loading("Iniciando sesión ....");
@@ -61,14 +64,8 @@ const Login = () => {
       setTimeout(() => {
         // usuario baneado
         if (isBanned) {
-          toast.error(
-            banInfo?.reason ||
-            "Tu cuenta esta baneado.",
-            {
-              id: toastId,
-            }
-          );
-
+          toast.error(banInfo?.reason || "Tu cuenta esta baneado.", { id: toastId });
+          setLoading(false);
           return;
         }
 
@@ -96,19 +93,49 @@ const Login = () => {
       }, 1500);
     } catch (error) {
       setTimeout(() => {
-        toast.error(
-          "Credenciales invalidas",
-          { id: toastId }
-        );
+        if (error.response?.data?.accountDeleted) {
+          toast.dismiss(toastId);
+          setAccountDeleted(true);
+          setError(error.response.data.message);
+          setLoading(false);
+          return;
+        }
 
-        setError(
-          error.response?.data?.message ||
-          "Login failed"
-        );
+        toast.error("Credenciales invalidas", { id: toastId });
+
+        setError(error.response?.data?.message || "Login failed");
 
         setLoading(false);
 
       }, 1500);
+    }
+  };
+
+  const handleReactivate = async () => {
+    const toastId = toast.loading("Reactivando cuenta ....");
+
+    try {
+      setLoading(true);
+
+      const response = await publicAxios.post(API_PATHS.AUTH.REACTIVAR_CUENTA, {
+        email,
+        password,
+      });
+
+      toast.success(response.data.message || "Cuenta reactivada con exito", { id: toastId });
+
+      setAccountDeleted(false);
+      setError(null);
+
+      // Con la cuenta ya activa, iniciamos sesión con las mismas credenciales
+      await handleLogin();
+
+    } catch (error) {
+      const message = error.response?.data?.message || "Error al reactivar la cuenta";
+
+      toast.error(message, { id: toastId });
+      setError(message);
+      setLoading(false);
     }
   };
 
@@ -149,7 +176,7 @@ const Login = () => {
                 value={password}
                 onChange={({ target }) => setPassword(target.value)}
                 label="Password"
-                placeholder="Min 8 caracteres"
+                placeholder="Tu contraseña"
                 type="password"
               />
 
@@ -157,6 +184,17 @@ const Login = () => {
                 <div className="bg-red-100 border border-red-300 text-red-700 text-sm rounded-lg px-4 py-3 transition-all duration-500">
                   {error}
                 </div>
+              )}
+
+              {accountDeleted && (
+                <button
+                  type="button"
+                  onClick={handleReactivate}
+                  disabled={loading}
+                  className="btn-primary"
+                >
+                  Reactivar mi cuenta
+                </button>
               )}
 
               <p className="text-[13px] text-slate-800 mt-3">
