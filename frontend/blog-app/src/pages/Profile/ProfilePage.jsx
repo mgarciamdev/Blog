@@ -8,23 +8,34 @@ import DeleteAccountSection from './components/DeleteAccountSection';
 const ProfilePage = () => {
     const { user } = useContext(UserContext);
 
+    if (!user) return null;
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 my-4 md:my-6">
-            <div className="col-span-12 md:col-span-6 bg-white p-6 rounded-2xl shadow-md shadow-gray-100 border border-gray-200/50 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-sky-200">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 my-4 md:my-6 items-stretch">
+
+            {/* DATOS PERSONALES DEL USUARIO */}
+            <section className="min-w-0 xl:col-span-6 bg-white p-5 md:p-6 rounded-2xl shadow-sm transition-all border border-gray-200/70 duration-300 hover:shadow-md hover:border-sky-200">
                 <ProfileInfoForm user={user} />
-            </div>
-            <div className="col-span-5 md:col-span-3 bg-white p-6 rounded-2xl shadow-md hover:shadow-lg shadow-gray-100 border border-gray-200/50 transition-all duration-300 hover:-translate-y-1 hover:border-emerald-200">
-                <UsernameForm user={user} />
+            </section>
 
-                <div className="my-6 border-t border-gray-200" />
+            {/* CONFIGURACIÓN */}
+            <div className="xl:col-span-6 grid grid-cols-1 md:grid-cols-2 gap-5 items-start">
 
-                <PasswordForm />
+                {/* CAMBIO DE CONTRASEÑA */}
+                <section className="min-w-0 xl:col-span-2 bg-white p-5 md:p-6 rounded-2xl shadow-sm transition-all border border-gray-200/70 duration-300 hover:shadow-md hover:border-emerald-200">
+                    <PasswordForm />
+                </section>
+
+                {/* CAMBIO DE USUARIO */}
+                <section className="min-w-0 xl:col-span-2 bg-white p-5 md:p-6 rounded-2xl shadow-sm transition-all border border-gray-200/70 duration-300 hover:shadow-md hover:border-emerald-200">
+                    <UsernameForm user={user} />
+                </section>
             </div>
 
             {/* ZONA PELIGROSA */}
-            <div className="col-span-5 md:col-span-3 bg-white p-6 rounded-2xl shadow-md hover:shadow-lg shadow-gray-100 border border-gray-200/50 transition-all duration-300 hover:-translate-y-1 hover:border-red-200">
+            <section className="min-w-0 xl:col-span-12 bg-white p-5 md:p-6 rounded-2xl shadow-sm transition-all border border-gray-200/70 duration-300 hover:shadow-md hover:border-red-200">
                 <DeleteAccountSection />
-            </div>
+            </section>
         </div>
     );
 };
