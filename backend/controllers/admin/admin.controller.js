@@ -1,6 +1,7 @@
 const User = require("../../models/User");
 const { getModerationStatsByUser, calculateActiveStrikePoints } = require("../../services/moderation.service");
 const exportUsersService = require("../../services/export/exportUsers.service");
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // @desc    Get user (admin view)
 // @route   GET /api/admin/users/:id
@@ -10,9 +11,7 @@ const getUserByIdAdmin = async (req, res) => {
         const { id } = req.params;
 
         const user = await User.findById(id)
-            .select(
-                "username name email role isVerified createdAt lastUsernameChange"
-            );
+            .select("username name email role isVerified createdAt lastUsernameChange idDeleted deletedAt");
 
         if (!user) {
             return res.status(404).json({
@@ -42,6 +41,12 @@ const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
 
+        if (req.user._id.toString() === id) {
+            return res.status(400).json({
+                message: "No puedes eliminar tu propia cuenta desde aquí"
+            });
+        }
+
         const userToDelete = await User.findById(id);
 
         if (!userToDelete) {
@@ -50,21 +55,26 @@ const deleteUser = async (req, res) => {
             });
         }
 
-        // 🔥 evitar eliminar superadmin
+        // evitar eliminar superadmin
         if (userToDelete.role === "superadmin") {
             return res.status(403).json({
                 message: "No puedes eliminar un superadmin"
             });
         }
 
-        // 🔥 opcional: evitar que un admin elimine a otro admin
+        // evita que un admin elimine a otro admin
         if (req.user.role === "admin" && userToDelete.role === "admin") {
             return res.status(403).json({
                 message: "No puedes eliminar otro admin"
             });
         }
 
-        await userToDelete.deleteOne();
+        userToDelete.isDeleted = true;
+        userToDelete.deletedAt = new Date();
+        userToDelete.deletedBy = req.user._id;
+        userToDelete.refreshToken = null;
+
+        await userToDelete.save();
 
         res.json({
             message: "Usuario eliminado correctamente"
@@ -83,10 +93,10 @@ const deleteUser = async (req, res) => {
 // @access  Private (admin | superadmin)
 const getAllUsers = async (req, res) => {
     try {
-        const { page = 1, limit = 10, search = "", role, verified, sort = "createdAt" } = req.query;
+        const { page = 1, limit = 10, search = "", role, status = "all", sort = "createdAt" } = req.query;
 
         const pageNumber = Math.max(1, parseInt(page) || 1);
-        const limitNumber = Math.min(50, parseInt(limit) || 10);
+        const limitNumber = Math.min(50, Math.max(1, parseInt(limit) || 10));
         const skip = (pageNumber - 1) * limitNumber;
 
         // sort seguro
@@ -95,26 +105,32 @@ const getAllUsers = async (req, res) => {
 
         // filtro base
         const query = {
-            isDeleted: { $ne: true }
+            isDeleted: status === "deleted" ? true : { $ne: true },
         };
 
-        // búsqueda
-        if (search) {
-            query.$or = [
-                { username: { $regex: search, $options: "i" } },
-                { email: { $regex: search, $options: "i" } }
-            ];
-        }
+        const term = String(search).trim();
 
-        // filtro por rol
-        if (role) {
+        if (term) {
+            const regex = new RegExp(escapeRegex(term), "i");
+            query.$or = [{name: regex}, {username: regex}, {email: regex}];
+        }
+        
+        if (["superadmin", "admin", "member"].includes(role)) {
             query.role = role;
         }
 
-        // filtro verificación
-        if (verified !== undefined) {
-            query.isVerified = verified === "true";
-        }
+        // búsqueda
+        // if (search) {
+        //     query.$or = [
+        //         { name: { $regex: search, $options: "i" } },
+        //         { username: { $regex: search, $options: "i" } },
+        //         { email: { $regex: search, $options: "i" } }
+        //     ];
+        // }
+
+        if (status === "verified") query.isVerified = true;
+        if (status === "not_verified") query.isVerified = false;
+        if (status === "banned") query.isBanned = true;
 
         // total
         const total = await User.countDocuments(query);
@@ -175,9 +191,11 @@ const updateUserProfileAdmin = async (req, res) => {
 
         await user.save();
 
+        const safeUser = await User.findById(id).select("-password -refreshToken -verificationToken -vfTokenExpires -resetPasswordToken -resetPasswordExpires ");
+
         res.json({
             message: "Perfil actualizado correctamente",
-            user
+            user: safeUser
         });
 
     } catch (error) {
@@ -193,7 +211,7 @@ const updateUserProfileAdmin = async (req, res) => {
 // @access  Private (admin | superadmin)
 const exportUsers = async (req, res) => {
     try {
-        const {format} = req.params;
+        const { format } = req.params;
 
         const allowedFormats = [
             "csv",

@@ -45,14 +45,16 @@ const drawExcelReportHeader = (worksheet, { title, generatedBy, totalUsers, stat
         bold: true,
     };
 
-    worksheet.getCell("A8").value = `Usuarios Totales: ${totalUsers}`;
-    worksheet.getCell("A9").value = `Super Administradores: ${stats.superadmins}`;
-    worksheet.getCell("A10").value = `Administradores: ${stats.admins}`;
-    worksheet.getCell("A11").value = `Miembros: ${stats.members}`;
-    worksheet.getCell("A12").value = `Usuarios Verificados: ${stats.verified}`;
-    worksheet.getCell("A13").value = `Usuarios Baneados: ${stats.banned}`;
+    worksheet.getCell("A8").value = `Total de Cuentas: ${totalUsers}`;
+    worksheet.getCell("A9").value = `Cuentas Activas: ${stats.active ?? 0}`;
+    worksheet.getCell("A10").value = `Super Administradores: ${stats.superadmins ?? 0}`;
+    worksheet.getCell("A11").value = `Administradores: ${stats.admins ?? 0}`;
+    worksheet.getCell("A12").value = `Miembros: ${stats.members ?? 0}`;
+    worksheet.getCell("A13").value = `Usuarios Verificados: ${stats.verified ?? 0}`;
+    worksheet.getCell("A14").value = `Usuarios Baneados: ${stats.banned ?? 0}`;
+    worksheet.getCell("A15").value = `Usuarios Eliminados: ${stats.deleted ?? 0}`;
 
-    return 15;
+    return 16;
 
 };
 

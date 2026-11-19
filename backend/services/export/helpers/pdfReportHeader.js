@@ -46,12 +46,14 @@ const drawPdfReportHeader = (doc, { title, generatedBy, totalUsers, stats }) => 
         .fontSize(10)
         .fillColor("#111827");
 
-    doc.text(`Usuarios Totales: ${totalUsers}`);
+    doc.text(`Total de Cuentas: ${totalUsers}`);
+    doc.text(`Cuentas Activas: ${stats.active ?? 0}`);
     doc.text(`Super Administradores: ${stats.superadmins ?? 0}`);
     doc.text(`Administradores: ${stats.admins ?? 0}`);
     doc.text(`Miembros: ${stats.members ?? 0}`);
     doc.text(`Usuarios Verificados: ${stats.verified ?? 0}`);
     doc.text(`Usuarios Baneados: ${stats.banned ?? 0}`);
+    doc.text(`Usuarios Eliminados: ${stats.deleted ?? 0}`);
 
     doc.moveDown(0.8);
 };

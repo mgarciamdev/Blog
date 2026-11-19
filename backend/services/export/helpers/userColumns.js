@@ -25,6 +25,11 @@ const userColumns = [
         width: 20,
     },
     {
+        key: "status",
+        header: "Cuenta",
+        width: 14,
+    },
+    {
         key: "verified",
         header: "Verificación",
         width: 18,
@@ -44,6 +49,11 @@ const userColumns = [
         header: "Fecha de Registro",
         width: 25,
     },
+    {
+        key: "deletedAt",
+        header: "Fecha de Eliminación",
+        width: 25,
+    }
 ];
 
 module.exports = userColumns;

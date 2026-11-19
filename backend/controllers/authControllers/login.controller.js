@@ -26,6 +26,12 @@ const loginUser = async (req, res) => {
                 const isMatch = await bcrypt.compare(password, deletedUser.password);
 
                 if (isMatch) {
+                    if (deletedUser.deletedBy) {
+                        return res.status(403).json({
+                            message: "Esta cuenta fue eliminada por administrador."
+                        });
+                    }
+
                     return res.status(403).json({
                         message: "Esta cuenta fue eliminada. Puedes reactivarla.",
                         accountDeleted: true,

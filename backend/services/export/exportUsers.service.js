@@ -21,8 +21,8 @@ const exportUsersService = async (format, currentUser) => {
     }
 
     // Obtener usuarios ordenados por fecha
-    const users = await User.find({})
-        .select("-password")
+    const users = await User.find({ isDeleted: { $in: [true, false] } })
+        .select("name username email role isVerified isBanned createdAt isDeleted deletedAt")
         .sort({ createdAt: -1 })
         .lean();
 
@@ -35,10 +35,14 @@ const exportUsersService = async (format, currentUser) => {
         username: user.username,
         email: user.email,
         role: formatRole(user.role),
+        status: user.isDeleted ? "Eliminada" : "Activa",
         verified: formatVerification(user.isVerified),
-        banned: formatModerationStatus(user.isBanned, user.activeStrikePoints),
+        banned: user.isBanned
+            ? "Baneado"
+            :formatModerationStatus(user.isBanned, user.activeStrikePoints),
         strikes: user.activeStrikePoints,
         createdAt: formatDate(user.createdAt),
+        deletedAt: user.isDeleted ? formatDate(user.deletedAt) : "-",
     }));
 
     switch (format) {

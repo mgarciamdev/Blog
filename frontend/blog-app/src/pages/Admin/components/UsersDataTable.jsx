@@ -22,9 +22,13 @@ const UsersDataTable = () => {
     dayjs.locale("es");
 
     const [users, setUsers] = useState([]);
+    const [total, setTotal] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState("");
+    const [debounceSearch, setDebounceSearch] = useState("");
+    const [refreshKey, setRefreshKey] = useState(0);
     const [usersPerPage, setUsersPerPage] = useState(10);
     const [selectedUser, setSelectedUser] = useState(null);
     const [openEditModal, setOpenEditModal] = useState(false);
@@ -39,20 +43,57 @@ const UsersDataTable = () => {
 
     const { user } = useContext(UserContext);
 
-    const getAllUsers = async () => {
-        try {
-            setLoading(true);
+    const refresh = () => setRefreshKey((k) => k + 1);
 
-            const response = await axiosInstance.get(API_PATHS.ADMIN.OBTENER_TODOS_LOS_USUARIOS);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebounceSearch(search.trim());
+            setCurrentPage(1);
+        }, 500);
 
-            setUsers(response.data?.users || [])
+        return () => clearTimeout(timer);
+    }, [search]);
 
-        } catch (error) {
-            console.error("Error al obtener los usuarios:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    useEffect(() => {
+        let ignore = false;
+
+        const fetchUsers = async () => {
+            try {
+                setLoading(true);
+
+                const response = await axiosInstance.get(API_PATHS.ADMIN.OBTENER_TODOS_LOS_USUARIOS,
+                    {
+                        params: {
+                            page: currentPage,
+                            limit: usersPerPage,
+                            search: debounceSearch || undefined,
+                            role: roleFilter !== "all" ? roleFilter : undefined,
+                            status: statusFilter,
+                        }
+                    },
+                );
+
+                if (ignore) return;
+
+                const { users: list, total: count, pages } = response.data;
+
+                setUsers(list || []);
+                setTotal(count || 0);
+                setTotalPages(pages || 1);
+
+                if (currentPage > (pages || 1)) setCurrentPage(pages || 1);
+
+            } catch (error) {
+                if (!ignore) console.error("Error al obtener los usuarios:", error);
+            } finally {
+                if (!ignore) setLoading(false);
+            }
+        };
+
+        fetchUsers();
+
+        return () => { ignore = true; };
+    }, [currentPage, usersPerPage, debounceSearch, roleFilter, statusFilter, refreshKey]);
 
     const deleteUser = async (id) => {
         try {
@@ -65,53 +106,11 @@ const UsersDataTable = () => {
                 data: null,
             });
 
-            await getAllUsers();
+            refresh();
         } catch (error) {
             console.error("Error al borrar el usuario:", error);
         }
     };
-
-    useEffect(() => {
-        getAllUsers();
-    }, []);
-
-    const filteredUsers = users.filter((u) => {
-
-        const matchesSearch =
-            (u.name || "")
-                .toLowerCase()
-                .includes(search.toLowerCase()) ||
-
-            (u.email || "")
-                .toLowerCase()
-                .includes(search.toLowerCase()) ||
-
-            (u.username || "")
-                .toLowerCase()
-                .includes(search.toLowerCase());
-
-        const matchesRole =
-            roleFilter === "all" ||
-            u.role === roleFilter;
-
-        const matchesStatus =
-            statusFilter === "all" ||
-
-            (statusFilter === "verified" &&
-                u.isVerified) ||
-
-            (statusFilter === "not_verified" &&
-                !u.isVerified) ||
-
-            (statusFilter === "banned" &&
-                u.isBanned);
-
-        return (
-            matchesSearch &&
-            matchesRole &&
-            matchesStatus
-        );
-    });
 
     const closeDeleteModal = () => {
         setOpenDeleteAlert({
@@ -135,10 +134,7 @@ const UsersDataTable = () => {
         },
     };
 
-    const indexOfLastUser = currentPage * usersPerPage;
-    const indexOfFirstUser = indexOfLastUser - usersPerPage;
-    const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
-    const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+    const indexOfFirstUser = (currentPage - 1) * usersPerPage;
 
     const options = [10, 15, 20, 25, 30];
 
@@ -164,7 +160,7 @@ const UsersDataTable = () => {
                 <div>
                     <h2 className="text-2xl font-semibold">Directorio de Usuarios</h2>
                     <p className="text-sm text-gray-500 mt-1 mb-4">
-                        Sistema de usuarios ({filteredUsers.length} usuarios)
+                        Sistema de usuarios ({total} usuarios)
                     </p>
                 </div>
 
@@ -197,7 +193,6 @@ const UsersDataTable = () => {
                         value={search}
                         onChange={(e) => {
                             setSearch(e.target.value);
-                            setCurrentPage(1);
                         }}
                         className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-200"
                     />
@@ -256,6 +251,10 @@ const UsersDataTable = () => {
                             value: "banned",
                             label: "Baneados",
                         },
+                        {
+                            value: "deleted",
+                            label: "Eliminados",
+                        }
                     ]}
                 />
 
@@ -285,14 +284,22 @@ const UsersDataTable = () => {
 
                         <AnimatePresence mode="wait">
                             <motion.tbody
-                                key={`${currentPage}-${search}`}
+                                key={`${currentPage}-${debounceSearch}`}
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.3 }}
                                 className="bg-white divide-y divide-gray-100 transition-colors duration-300"
                             >
-                                {currentUsers.map((usuario, index) => (
+                                {users.length === 0 && (
+                                    <tr>
+                                        <td colSpan={10} className="px-4 py-10 text-gray-500">
+                                            No se encontraron usuarios.
+                                        </td>
+                                    </tr>
+                                )}
+
+                                {users.map((usuario, index) => (
                                     <tr className="divide-x divide-gray-300" key={usuario._id}>
                                         <td className="px-4 py-3">{indexOfFirstUser + index + 1}</td>
                                         <td className="px-4 py-3">{usuario.name}</td>
@@ -314,7 +321,18 @@ const UsersDataTable = () => {
                                             {dayjs(usuario.createdAt).format("DD MMM YYYY")}
                                         </td>
                                         <td className="px-4 py-3">
-                                            {usuario.isVerified ? (
+                                            {usuario.isDeleted ? (
+                                                <span
+                                                    title={
+                                                        usuario.deletedBy
+                                                            ? "Eliminada por un administrador. No puede reactivarse."
+                                                            : `Se eliminará definitivamente el ${dayjs(usuario.deletedAt).add(30, "day").format("DD MMM YYYY")}`
+                                                    }
+                                                    className="px-6 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700"
+                                                >
+                                                    Eliminada
+                                                </span>
+                                            ) : usuario.isVerified ? (
                                                 <span className="px-6 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
                                                     Verificado
                                                 </span>
@@ -325,7 +343,9 @@ const UsersDataTable = () => {
                                             )}
                                         </td>
                                         <td className="px-4 py-3 hidden lg:table-cell">
-                                            {usuario.isBanned ? (
+                                            {usuario.isDeleted ? (
+                                                <span className="text-gray-400">—</span>
+                                            ) : usuario.isBanned ? (
                                                 <span className="px-6 py-1 rounded-full text-xs font-semibold bg-rose-100 text-red-700">
                                                     Baneado
                                                 </span>
@@ -346,7 +366,7 @@ const UsersDataTable = () => {
                                         <td className="px-4 py-3 hidden lg:table-cell">{usuario.activeStrikePoints}</td>
                                         <td className="px-4 py-3">
                                             <div className="relative inline-block">
-                                                {!canManageUser(user, usuario) ? (
+                                                {!canManageUser(user, usuario) || usuario.isDeleted ? (
                                                     <span className="">
                                                         <LuEllipsisVertical size={18} title="Acciones Bloqueadas" />
                                                     </span>
@@ -426,7 +446,7 @@ const UsersDataTable = () => {
                     />
 
                     <span>
-                        de {filteredUsers.length} filas
+                        de {total} filas
                     </span>
                 </div>
 
@@ -511,13 +531,13 @@ const UsersDataTable = () => {
                 user={selectedUser}
                 isOpen={openEditModal}
                 onClose={() => setOpenEditModal(false)}
-                onUserUpdated={getAllUsers}
+                onUserUpdated={refresh}
             />
 
             <CreateUserForm
                 isOpen={openCreateModal}
                 onClose={() => setOpenCreateModal(false)}
-                onUserCreated={getAllUsers}
+                onUserCreated={refresh}
             />
 
         </div >

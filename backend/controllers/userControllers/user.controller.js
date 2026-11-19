@@ -2,7 +2,7 @@ const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 const { sendPasswordChangeEmail } = require("../../utils/emailHelper");
 
-const SAFE_USER_FIELDS = "-password -refreshToken -verificationToken -vfTokenExpires -resetPasswordToken -resetPasswordExpires -isDeleted -deletedAt -__v";
+const SAFE_USER_FIELDS = "-password -refreshToken -verificationToken -vfTokenExpires -resetPasswordToken -resetPasswordExpires -isDeleted -deletedAt -deletedBy -__v";
 
 const getSanatizedUser = (userId) => User.findById(userId).select(SAFE_USER_FIELDS);
 

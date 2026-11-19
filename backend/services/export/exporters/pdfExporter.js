@@ -39,28 +39,17 @@ const pdfExporter = async (users, generatedBy) => {
     // Estadísticas
     // ==========================================
 
+    const activeUsers = users.filter(u => u.status !== "Eliminada");
+    const deletedUsers = users.filter(u => u.status === "Eliminada");
+
     const stats = {
-
-        superadmins: users.filter(
-            u => u.role === "Super Administrador"
-        ).length,
-
-        admins: users.filter(
-            u => u.role === "Administrador"
-        ).length,
-
-        members: users.filter(
-            u => u.role === "Miembro"
-        ).length,
-
-        verified: users.filter(
-            u => u.verified === "Verificado"
-        ).length,
-
-        banned: users.filter(
-            u => u.banned === "Baneado"
-        ).length,
-
+        superadmins: activeUsers.filter(u => u.role === "Super Administrador").length,
+        admins: activeUsers.filter(u => u.role === "Administrador").length,
+        members: activeUsers.filter(u => u.role === "Miembro").length,
+        verified: activeUsers.filter(u => u.verified === "Verificado").length,
+        banned: activeUsers.filter(u => u.banned === "Baneado").length,
+        active: activeUsers.length,
+        deleted: deletedUsers.length,
     };
 
     // ==========================================

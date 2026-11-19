@@ -45,13 +45,14 @@ const drawPdfTable = (doc, users) => {
     const bottomMargin = 55;
 
     const columns = [
-        { key: "name", width: 130 },
-        { key: "username", width: 90 },
-        { key: "email", width: 210 },
-        { key: "role", width: 110 },
-        { key: "verified", width: 95 },
-        { key: "banned", width: 85 },
-        { key: "strikes", width: 60 },
+        { key: "name", width: 120 },
+        { key: "username", width: 85 },
+        { key: "email", width: 180 },
+        { key: "role", width: 100 },
+        { key: "status", width: 65 },
+        { key: "verified", width: 80 },
+        { key: "banned", width: 75 },
+        { key: "strikes", width: 55 },
     ];
 
     // =====================================
@@ -77,13 +78,10 @@ const drawPdfTable = (doc, users) => {
         // ¿ Cabe otra fila?
         // -----------------------------
         if (currentY + rowHeight > doc.page.height - bottomMargin) {
-
             doc.addPage();
-
             drawPdfWatermark(doc);
 
             currentY = 40;
-
             currentY = drawTableHeader(
                 doc,
                 columns,
@@ -125,6 +123,22 @@ const drawPdfTable = (doc, users) => {
 
                 }
 
+            }
+
+            // =====================================
+            // Estado de la cuenta
+            // =====================================
+
+            if (column.key === "status") {
+                switch (user.status) {
+                    case "Activa":
+                        cellBackground = "#D1FAE5";
+                        break;
+
+                    case "Eliminada":
+                        cellBackground = "#E5E7EB";
+                        break;
+                }
             }
 
             // =====================================

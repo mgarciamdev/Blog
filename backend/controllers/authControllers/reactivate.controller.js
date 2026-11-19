@@ -17,7 +17,10 @@ const reactivateAccount = async (req, res) => {
             });
         }
 
-        const user = await User.findOneIncludingDeleted({ email: normalizedEmail });
+        const user = await User.findOneIncludingDeleted({
+            email: normalizedEmail,
+            deletedAt: { $ne: null },
+        });
 
         if (!user || !user.isDeleted) {
             return res.status(404).json({
@@ -33,12 +36,28 @@ const reactivateAccount = async (req, res) => {
             });
         }
 
+        if (user.deletedBy) {
+            return res.status(403).json({
+                message: "Esta cuenta fue eliminada por un administrador y no puede reactivarse."
+            });
+        }
+
         const daysSinceDeletion =
             (Date.now() - new Date(user.deletedAt)) / (1000 * 60 * 60 * 24);
 
         if (daysSinceDeletion > GRACE_PERIOD_DAYS) {
             return res.status(400).json({
                 message: "El periodo para reactivar esta cuenta ya expiró"
+            });
+        }
+
+        const taken = await User.findOne({
+            $or: [{ email: user.email }, { username: user.username }],
+        });
+
+        if (taken) {
+            return res.status(400).json({
+                message: "El correo o nombre de usuario de esta cuenta ya está en uso. No se puede reactivar."
             });
         }
 

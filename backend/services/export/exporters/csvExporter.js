@@ -5,7 +5,7 @@ const { formatFileDate } = require("../../../utils/exportHelper");
 
 // Mismas columnas que muestran el PDF y el Excel (pdfTable.js / excelExporter.js).
 // Si más adelante quieren que el CSV traiga "id" o "createdAt" además, basta con agregarlas aquí.
-const EXPORT_COLUMN_KEYS = ["name", "username", "email", "role", "verified", "banned", "strikes"];
+const EXPORT_COLUMN_KEYS = ["name", "username", "email", "role", "status", "verified", "banned", "strikes", "deletedAt"];
 
 const csvExporter = (users) => {
     const exportColumns = userColumns.filter(

@@ -6,7 +6,7 @@ const { formatFileDate } = require("../../../utils/exportHelper");
 
 // Mismas columnas que muestra el PDF (pdfTable.js). Si más adelante quieren
 // que el Excel traiga "id" o "createdAt" además, basta con agregarlas aquí.
-const EXPORT_COLUMN_KEYS = ["name", "username", "email", "role", "verified", "banned", "strikes"];
+const EXPORT_COLUMN_KEYS = ["name", "username", "email", "role", "status", "verified", "banned", "strikes", "createdAt", "deletedAt"];
 
 const excelExporter = async (users, currentUser) => {
 
@@ -20,6 +20,7 @@ const excelExporter = async (users, currentUser) => {
     const nameColumnIndex = exportColumns.findIndex(c => c.key === "name") + 1;
     const emailColumnIndex = exportColumns.findIndex(c => c.key === "email") + 1;
     const roleColumnIndex = exportColumns.findIndex(c => c.key === "role") + 1;
+    const accountStatusColumnIndex = exportColumns.findIndex(c => c.key === "status") + 1;
     const verifiedColumnIndex = exportColumns.findIndex(c => c.key === "verified") + 1;
     const bannedColumnIndex = exportColumns.findIndex(c => c.key === "banned") + 1;
 
@@ -35,12 +36,17 @@ const excelExporter = async (users, currentUser) => {
     // Header del reporte
     // ==========================================
 
+    const activateUsers = users.filter(u => u.status !== "Eliminada");
+    const deletedUsers = users.filter(u => u.status === "Eliminada");
+
     const stats = {
-        superadmins: users.filter(u => u.role === "Super Administrador").length,
-        admins: users.filter(u => u.role === "Administrador").length,
-        members: users.filter(u => u.role === "Miembro").length,
-        verified: users.filter(u => u.verified === "Verificado").length,
-        banned: users.filter(u => u.banned === "Baneado").length,
+        superadmins: activateUsers.filter(u => u.role === "Super Administrador").length,
+        admins: activateUsers.filter(u => u.role === "Administrador").length,
+        members: activateUsers.filter(u => u.role === "Miembro").length,
+        verified: activateUsers.filter(u => u.verified === "Verificado").length,
+        banned: activateUsers.filter(u => u.banned === "Baneado").length,
+        active: activateUsers.length,
+        deleted: deletedUsers.length,
     };
 
     const tableHeaderRow = drawExcelReportHeader(worksheet, {
@@ -49,7 +55,7 @@ const excelExporter = async (users, currentUser) => {
         totalUsers: users.length,
         stats,
         totalColumns: exportColumns.length,
-    });
+    }) + 1;
 
     // ==========================================
     // Encabezados de la tabla
@@ -211,6 +217,24 @@ const excelExporter = async (users, currentUser) => {
                     fgColor: { argb: "FFD1FAE5" },
                 };
                 break;
+        }
+
+        if (accountStatusColumnIndex > 0) {
+            const accountStatusCell = row.getCell(accountStatusColumnIndex);
+
+            if (accountStatusCell.value === "Eliminada") {
+                accountStatusCell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "FFE5E7EB" },
+                };
+            } else if (accountStatusCell.value === "Activa") {
+                accountStatusCell.fill = {
+                    type: "pattern",
+                    pattern: "solid",
+                    fgColor: { argb: "FFD1FAE5" },
+                };
+            }
         }
 
         // Verificación
