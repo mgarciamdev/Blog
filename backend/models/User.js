@@ -31,20 +31,20 @@ const UserSchema = new mongoose.Schema(
         isDeleted: { type: Boolean, default: false },
         deletedAt: { type: Date, default: null },
         deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+        deletionReason: { type: String, default: null },
     },
     { timestamps: true }
 );
 
 // --- Índices ---
-// Únicos solo entre usuarios no eliminados, para poder liberar el email/username cuando una cuenta se marca como eliminada.
 UserSchema.index(
     { email: 1 },
-    { unique: true, partialFilterExpression: { isDeleted: false } }
+    { unique: true }
 );
 
 UserSchema.index(
     { username: 1 },
-    { unique: true, partialFilterExpression: { isDeleted: false } }
+    { unique: true }
 );
 
 // --- Middleware ---

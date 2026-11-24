@@ -7,6 +7,7 @@ const {
     deleteUser,
     updateUserProfileAdmin,
     exportUsers,
+    restoreUser
 } = require("../controllers/admin/admin.controller");
 
 const { protect } = require("../middlewares/authMiddleware");
@@ -40,6 +41,11 @@ router.put(
 router.get(
     "/users/export/:format",
     exportUsers
+);
+
+router.patch(
+    "/users/:id/restore",
+    restoreUser
 );
 
 module.exports = router;

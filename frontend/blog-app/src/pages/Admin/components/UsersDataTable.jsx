@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import EditUserForm from './EditUserForm';
-import { LuEllipsisVertical, LuPencil, LuTrash2, LuSearch, LuPlus } from "react-icons/lu";
+import { LuEllipsisVertical, LuPencil, LuTrash2, LuSearch, LuPlus, LuRotateCcw } from "react-icons/lu";
 import { CiExport } from "react-icons/ci";
 import DeleteAlertContent from '../../../components/DeleteAlertContent';
 import Modal from '../../../components/Modal';
@@ -95,9 +95,11 @@ const UsersDataTable = () => {
         return () => { ignore = true; };
     }, [currentPage, usersPerPage, debounceSearch, roleFilter, statusFilter, refreshKey]);
 
-    const deleteUser = async (id) => {
+    const deleteUser = async (id, reason) => {
         try {
-            await axiosInstance.delete(API_PATHS.ADMIN.ELIMINAR_USUARIO(id));
+            await axiosInstance.delete(API_PATHS.ADMIN.ELIMINAR_USUARIO(id),
+                { data: { reason } }
+            );
 
             toast.success("Usuario eliminado correctamente...");
 
@@ -109,6 +111,21 @@ const UsersDataTable = () => {
             refresh();
         } catch (error) {
             console.error("Error al borrar el usuario:", error);
+            toast.error(error.response?.data?.message || "Error al eliminar el usuario.");
+            setOpenDeleteAlert({
+                open: false,
+                data: null,
+            });
+        }
+    };
+
+    const handleRestore = async (id) => {
+        try {
+            await axiosInstance.patch(API_PATHS.ADMIN.RESTAURAR_USUARIO(id));
+            toast.success("Usuario restaurado correctamente");
+            refresh();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Error al restaurar el usuario");
         }
     };
 
@@ -325,7 +342,7 @@ const UsersDataTable = () => {
                                                 <span
                                                     title={
                                                         usuario.deletedBy
-                                                            ? "Eliminada por un administrador. No puede reactivarse."
+                                                            ? "Eliminada por un administrador. solo un admin puede reactivarla."
                                                             : `Se eliminará definitivamente el ${dayjs(usuario.deletedAt).add(30, "day").format("DD MMM YYYY")}`
                                                     }
                                                     className="px-6 py-1 rounded-full text-xs font-semibold bg-gray-200 text-gray-700"
@@ -366,10 +383,24 @@ const UsersDataTable = () => {
                                         <td className="px-4 py-3 hidden lg:table-cell">{usuario.activeStrikePoints}</td>
                                         <td className="px-4 py-3">
                                             <div className="relative inline-block">
-                                                {!canManageUser(user, usuario) || usuario.isDeleted ? (
+                                                {!canManageUser(user, usuario) ? (
                                                     <span className="">
                                                         <LuEllipsisVertical size={18} title="Acciones Bloqueadas" />
                                                     </span>
+                                                ) : usuario.isDeleted ? (
+                                                    usuario.deletedBy ? (
+                                                        <button
+                                                            title="Restaurar"
+                                                            className="p-2 rounded-lg hover:bg-gray-100 text-emerald-600"
+                                                            onClick={() => handleRestore(usuario._id)}
+                                                        >
+                                                            <LuRotateCcw size={18} />
+                                                        </button>
+                                                    ) : (
+                                                        <span title="El usuario puede reactivarla desde el login">
+                                                            <LuEllipsisVertical size={18} />
+                                                        </span>
+                                                    )
                                                 ) : (
                                                     <>
                                                         <button
@@ -519,8 +550,11 @@ const UsersDataTable = () => {
                 >
                     <div className="w-[70vw] md:w-[30vw]">
                         <DeleteAlertContent
-                            content="¿Estas seguro(a) de querer eliminar este usuario? Esta acción no puede deshacerse."
-                            onDelete={() => deleteUser(openDeleteAlert.data)}
+                            content="¿Esta cuenta se desactivará y se eliminará definitivamente a los 30 días. El usuario no podrá reactivarla"
+                            requireReason
+                            reasonLabel="Motivo de la eliminación"
+                            reasonPlaceholder="Explica por qué se elimina esta cuenta..."
+                            onDelete={(reason) => deleteUser(openDeleteAlert.data, reason)}
                             onCancel={closeDeleteModal}
                         />
                     </div>

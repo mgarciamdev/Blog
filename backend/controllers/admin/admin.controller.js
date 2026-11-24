@@ -1,6 +1,7 @@
 const User = require("../../models/User");
 const { getModerationStatsByUser, calculateActiveStrikePoints } = require("../../services/moderation.service");
 const exportUsersService = require("../../services/export/exportUsers.service");
+const { sendAccountDeletedByAdminEmail, sendAccountReactivatedEmail } = require("../../utils/emails/emailHelper");
 const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // @desc    Get user (admin view)
@@ -11,7 +12,7 @@ const getUserByIdAdmin = async (req, res) => {
         const { id } = req.params;
 
         const user = await User.findById(id)
-            .select("username name email role isVerified createdAt lastUsernameChange idDeleted deletedAt");
+            .select("username name email role isVerified createdAt lastUsernameChange idDeleted deletedAt deletionReason");
 
         if (!user) {
             return res.status(404).json({
@@ -40,6 +41,13 @@ const getUserByIdAdmin = async (req, res) => {
 const deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
+        const {reason} = req.body;
+
+        if (!reason || reason.trim() === "") {
+            return res.status(400).json({
+                message: "Debes indicar el motivo de la eliminación"
+            });
+        }
 
         if (req.user._id.toString() === id) {
             return res.status(400).json({
@@ -72,9 +80,16 @@ const deleteUser = async (req, res) => {
         userToDelete.isDeleted = true;
         userToDelete.deletedAt = new Date();
         userToDelete.deletedBy = req.user._id;
+        userToDelete.deletionReason = reason.trim();
         userToDelete.refreshToken = null;
 
         await userToDelete.save();
+
+        try {
+            await sendAccountDeletedByAdminEmail(userToDelete, reason.trim());
+        } catch (error) {
+            console.error("Error al enviar correo de eliminación de cuenta:", error.message);
+        }
 
         res.json({
             message: "Usuario eliminado correctamente"
@@ -251,10 +266,73 @@ const exportUsers = async (req, res) => {
     }
 };
 
+// @desc    Restaurar un usuario eliminado por un admin o superadmin (admin || superadmin)
+// @route   POST /api/admin/users/:id/restore
+// @access  Private (admin | superadmin)
+const restoreUser = async (req, res) => {
+    try {
+        const {id} = req.params;
+
+        const user = await User.findByIdIncludingDeleted(id);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "Usuario no encontrado"
+            });
+        }
+
+        if (!user.isDeleted) {
+            return res.status(400).json({
+                message: "Este usuario no está eliminado"
+            });
+        }
+
+        if (req.user.role === "admin" && user.role === "admin") {
+            return res.status(403).json({
+                message: "No puedes restaurar la cuenta de otro admin"
+            });
+        }
+        
+        const taken = await User.findOne({
+            $or: [{ email: user.email }, { username: user.username }],
+        });
+
+        if (taken) {
+            return res.status(409).json({
+                message: "El correo o nombre de usuario ya está en uso por otra cuenta activa."
+            });
+        }
+
+        user.isDeleted = false;
+        user.deletedAt = null;
+        user.deletedBy = null;
+        user.deletionReason = null;
+
+        await user.save();
+
+        try {
+            await sendAccountReactivatedEmail(user);
+        } catch (error) {
+            console.error("Error enviando el email de restauración:", error.message);
+        }
+
+        res.json({
+            message: "Usuario restaurado correctamente"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Error al restaurar usuario",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     getUserByIdAdmin,
     deleteUser,
     getAllUsers,
     updateUserProfileAdmin,
-    exportUsers
+    exportUsers,
+    restoreUser
 };

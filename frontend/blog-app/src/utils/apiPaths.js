@@ -12,6 +12,7 @@ export const API_PATHS = {
         ELIMINAR_USUARIO: (id) => `/api/admin/users/${id}`, // Elimina al usuario por su id
         ACTUALIZAR_PERFIL_USUARIO: (id) => `/api/admin/users/${id}/profile`, //Admin o superadmin pueden modificar el perfil si incumple las reglas
         EXPORTAR_REPORTE: (format) => `/api/admin/users/export/${format}`, // Exporta el directorio de Usuarios a formatos distintos cuales como CSV, Excel y PDF
+        RESTAURAR_USUARIO: (id) => `/api/admin/users/${id}/restore`, // Restaura un usuario eliminado por un admin
     },
 
     AUTH: {
