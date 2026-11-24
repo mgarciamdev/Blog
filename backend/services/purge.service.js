@@ -16,7 +16,7 @@ const purgeExpiredAccounts = async ({ dryRun = false } = {}) => {
     }).select("_id username email deletedAt");
 
     if (expiredUsers.length === 0) {
-        return { pruged: 0, dryRun, users: [] };
+        return { purged: 0, dryRun, users: [] };
     }
 
     const userIds = expiredUsers.map(u => u._id);

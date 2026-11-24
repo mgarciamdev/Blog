@@ -1,8 +1,7 @@
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const sendEmail = require("../../utils/sendEmail");
-const { sendPasswordChangeEmail, sendRecoverPasswordEmail } = require("../../utils/emailHelper");
+const { sendPasswordChangeEmail, sendRecoverPasswordEmail } = require("../../utils/emails/emailHelper");
 
 // @desc    Reset de contraseña con token
 // @route   POST /api/auth/reset-password/:token

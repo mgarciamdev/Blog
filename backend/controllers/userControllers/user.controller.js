@@ -1,6 +1,6 @@
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
-const { sendPasswordChangeEmail } = require("../../utils/emailHelper");
+const { sendPasswordChangeEmail, sendAccountDeletSelfEmail } = require("../../utils/emails/emailHelper");
 
 const SAFE_USER_FIELDS = "-password -refreshToken -verificationToken -vfTokenExpires -resetPasswordToken -resetPasswordExpires -isDeleted -deletedAt -deletedBy -__v";
 
@@ -306,6 +306,12 @@ const deleteMyAccount = async (req, res) => {
         user.refreshToken = null; // invalida sesiones activas
         
         await user.save();
+
+        try {
+            await sendAccountDeletSelfEmail(user);
+        } catch (emailError) {
+            console.error("Error al enviar el email de cuenta eliminada:", emailError.message);
+        }
 
         res.json({
             message: "Cuenta eliminada correctamente"

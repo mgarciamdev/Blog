@@ -1,7 +1,6 @@
 const User = require("../../models/User");
 const crypto = require("crypto");
-const sendEmail = require("../../utils/sendEmail");
-const { sendVerificationEmail } = require("../../utils/emailHelper");
+const { sendVerificationEmail } = require("../../utils/emails/emailHelper");
 
 // @desc    Obtiene el Token de verificación y redirecciona a verify en el frontend
 // @route   POST /api/auth/verify/:token

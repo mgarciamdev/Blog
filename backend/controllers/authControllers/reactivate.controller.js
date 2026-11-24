@@ -1,5 +1,6 @@
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
+const { sendAccountReactivatedEmail } = require("../../utils/emails/emailHelper");
 
 const GRACE_PERIOD_DAYS = 30;
 
@@ -63,8 +64,16 @@ const reactivateAccount = async (req, res) => {
 
         user.isDeleted = false;
         user.deletedAt = null;
+        user.deletedBy = null;
+        user.deletionReason = null;
 
         await user.save();
+
+        try {
+            await sendAccountReactivatedEmail(user);
+        } catch (errorEmail) {
+            console.error("Error al enviar correo de reactivación:", errorEmail);
+        }
 
         res.json({
             message: "Cuenta reactivada correctamente. Ya puedes iniciar sesión."

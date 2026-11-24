@@ -1,6 +1,6 @@
 const Feedback = require("../../models/Feedback");
 const User = require("../../models/User");
-const { sendFeedbackResponseEmail } = require("../../utils/emailHelper");
+const { sendFeedbackResponseEmail } = require("../../utils/emails/emailHelper");
 const { INCLUDE_DELETED } = require("../../utils/queryHelper");
 
 // @desc    Crear un nuevo feedback por parte del usuario
