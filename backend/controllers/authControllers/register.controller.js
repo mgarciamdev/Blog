@@ -1,7 +1,7 @@
 const User = require("../../models/User");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const { sendVerificationEmail } = require("../../utils/emailHelper");
+const { sendVerificationEmail } = require("../../utils/emails/emailHelper");
 
 // @desc    Registro de nuevos usuarios
 // @route   POST /api/auth/register
@@ -33,15 +33,31 @@ const registerUser = async (req, res) => {
         }
 
         // Verificamos si el email ya existe
-        const userExists = await User.findOne({ email: normalizedEmail });
-        if (userExists) {
-            return res.status(400).json({ message: "El email ya está registrado" });
+        const existingEmail = await User.findOneIncludingDeleted({
+            email: normalizedEmail
+        });
+
+        if (existingEmail) {
+            return res.status(400).json({
+                message: existingEmail.isDeleted
+                    ? existingEmail.deletedBy
+                        ? "Este email pertenece a una cuenta eliminada por un administrador y no puede reutilizarse"
+                        : "Este email pertenece a una cuenta eliminada. Si es tuya, puedes reactivarla desde el login."
+                    : "El email ya está registrado"
+            });
         }
 
         //Verificamos si el username ya existe
-        const existingUsername = await User.findOne({ username: normalizedUsername });
+        const existingUsername = await User.findOneIncludingDeleted({
+            username: normalizedUsername
+        });
+
         if (existingUsername) {
-            return res.status(400).json({ message: "El nombre de usuario ya está en uso" });
+            return res.status(400).json({
+                message: existingUsername.isDeleted
+                    ? "Este nombre de usuario pertenece a una cuenta eliminada."
+                    : "El nombre de usuario ya está en uso"
+            });
         }
 
         const salt = await bcrypt.genSalt(10);
